@@ -2,10 +2,45 @@ const form = document.querySelector("#company-form");
 const statusBox = document.querySelector("#form-status");
 const submitButton = form?.querySelector("button[type='submit']");
 const submitButtonLabel = submitButton?.textContent || "Send hiring brief";
+const fallbackEmail = "adam@samer.solutions";
 
 function setStatus(message, type) {
-  statusBox.textContent = message;
+  statusBox.replaceChildren(message);
   statusBox.className = `form-status is-visible is-${type}`;
+}
+
+function fallbackMailLink(payload) {
+  const subject = encodeURIComponent(`Hiring brief from ${payload.companyName}`);
+  const body = encodeURIComponent(
+    [
+      `Company name: ${payload.companyName}`,
+      `Contact name: ${payload.contactName}`,
+      `Work email: ${payload.email}`,
+      `Phone: ${payload.phone}`,
+      `Company location: ${payload.location}`,
+      `Hiring model: ${payload.hiringModel}`,
+      "",
+      "Roles or skills needed:",
+      payload.roles,
+      "",
+      "Timeline and notes:",
+      payload.notes || "-",
+    ].join("\n"),
+  );
+
+  return `mailto:${fallbackEmail}?subject=${subject}&body=${body}`;
+}
+
+function setFallbackStatus(message, payload) {
+  const text = document.createTextNode(`${message} `);
+  const link = document.createElement("a");
+
+  link.className = "fallback-link";
+  link.href = fallbackMailLink(payload);
+  link.textContent = `Email ${fallbackEmail} instead.`;
+
+  statusBox.replaceChildren(text, link);
+  statusBox.className = "form-status is-visible is-error";
 }
 
 function payloadFromForm(formElement) {
@@ -56,9 +91,9 @@ form?.addEventListener("submit", async (event) => {
       "success",
     );
   } catch (error) {
-    setStatus(
-      error.message || "Something went wrong. Please try again.",
-      "error",
+    setFallbackStatus(
+      error.message || "Something went wrong.",
+      payload,
     );
   } finally {
     submitButton.disabled = false;
