@@ -1,3 +1,4 @@
 # Samer Solutions
 
-Minimal coming soon page for [samer.solutions](https://samer.solutions).
+Coming soon page for [samer.solutions](https://samer.solutions), based on the
+Samer Solutions LinkedIn company page.
