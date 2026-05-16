@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "check": "node -c api/leads.js && node -c api/report.js && node -c site.js"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.0.0"
+  }
+}
