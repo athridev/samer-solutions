@@ -17,6 +17,7 @@ const ALLOWED_HIRING_MODELS = new Set([
 
 const MAX_CONTENT_LENGTH = 10000;
 const WEBHOOK_TIMEOUT_MS = 5000;
+const REPORT_TO_EMAIL = process.env.LEAD_REPORT_TO || "adam@samer.solutions";
 
 function isEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -97,6 +98,26 @@ async function forwardToWebhook(lead) {
   }
 }
 
+async function storeLeadForReport(lead) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return;
+  }
+
+  const { put } = await import("@vercel/blob");
+  const day = lead.submittedAt.slice(0, 10);
+  const safeTimestamp = lead.submittedAt.replace(/[:.]/g, "-");
+
+  await put(
+    `leads/${day}/${safeTimestamp}.json`,
+    JSON.stringify({ ...lead, reportTo: REPORT_TO_EMAIL }),
+    {
+      access: "private",
+      addRandomSuffix: true,
+      contentType: "application/json",
+    },
+  );
+}
+
 module.exports = async function handler(request, response) {
   if (request.method !== "POST") {
     response.setHeader("Allow", "POST");
@@ -161,6 +182,12 @@ module.exports = async function handler(request, response) {
   }
 
   console.log("SAMER_SOLUTIONS_LEAD", JSON.stringify(lead));
+
+  try {
+    await storeLeadForReport(lead);
+  } catch (error) {
+    console.error("SAMER_SOLUTIONS_LEAD_STORAGE_ERROR", error);
+  }
 
   try {
     await forwardToWebhook(lead);
