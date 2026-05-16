@@ -38,8 +38,8 @@ body::before {
   z-index: -1;
   content: "";
   background:
-    radial-gradient(circle at 84% 8%, rgba(33, 102, 243, 0.16), transparent 32%),
-    radial-gradient(circle at 0 88%, rgba(15, 138, 104, 0.1), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(246, 248, 251, 0)),
+    linear-gradient(180deg, rgba(33, 102, 243, 0.08), transparent 42%),
     linear-gradient(rgba(7, 17, 31, 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(7, 17, 31, 0.035) 1px, transparent 1px);
   background-size: auto, auto, 44px 44px, 44px 44px;
