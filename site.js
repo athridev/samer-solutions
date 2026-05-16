@@ -1,6 +1,7 @@
 const form = document.querySelector("#company-form");
 const statusBox = document.querySelector("#form-status");
 const submitButton = form?.querySelector("button[type='submit']");
+const submitButtonLabel = submitButton?.textContent || "Send hiring brief";
 
 function setStatus(message, type) {
   statusBox.textContent = message;
@@ -27,13 +28,20 @@ form?.addEventListener("submit", async (event) => {
 
   const payload = payloadFromForm(form);
   submitButton.disabled = true;
-  setStatus("Sending your hiring brief...", "success");
+  submitButton.textContent = "Sending...";
+  form.setAttribute("aria-busy", "true");
+  setStatus("Sending your hiring brief...", "info");
 
   try {
     const response = await fetch("/api/leads", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(payload),
+      cache: "no-store",
+      credentials: "same-origin",
     });
 
     const result = await response.json().catch(() => ({}));
@@ -44,7 +52,7 @@ form?.addEventListener("submit", async (event) => {
 
     form.reset();
     setStatus(
-      "Brief received. Samer Solutions will review the company details.",
+      "Brief received. Our team will review the company details.",
       "success",
     );
   } catch (error) {
@@ -54,5 +62,7 @@ form?.addEventListener("submit", async (event) => {
     );
   } finally {
     submitButton.disabled = false;
+    submitButton.textContent = submitButtonLabel;
+    form.removeAttribute("aria-busy");
   }
 });
