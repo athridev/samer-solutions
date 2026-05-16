@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Samer Solutions is a boutique tech recruitment partner for permanent, contracting, and hybrid hiring."
+      content="Samer Solutions is a Dubai-based tech recruitment partner helping companies hire across the region."
     />
     <meta name="theme-color" content="#07111f" />
-    <title>Samer Solutions | Tech Recruitment</title>
+    <title>Samer Solutions | Tech Recruitment Across the Region</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -18,59 +18,176 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="site-shell" aria-labelledby="page-title">
-      <section class="hero">
-        <nav class="topbar" aria-label="Samer Solutions">
-          <a class="brand" href="https://www.linkedin.com/company/samersolutions/">
-            <span>
-              <strong>Samer Solutions</strong>
-              <small>Tech Recruitment</small>
-            </span>
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <nav class="topbar" aria-label="Primary navigation">
+          <a class="brand" href="/">
+            <strong>Samer Solutions</strong>
+            <span>Tech Recruitment</span>
           </a>
-          <a class="linkedin-link" href="https://www.linkedin.com/company/samersolutions/">
+          <a class="nav-link" href="https://www.linkedin.com/company/samersolutions/">
             LinkedIn
           </a>
         </nav>
 
         <div class="hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">Permanent · Contracting · Hybrid Hiring</p>
-            <h1 id="page-title">Quality tech hiring, without the noise.</h1>
+            <p class="eyebrow">Dubai based · Regional reach</p>
+            <h1 id="page-title">Tech hiring with signal, speed, and fit.</h1>
             <p class="intro">
-              Samer Solutions is a boutique tech recruitment partner helping
-              companies hire strong talent through a practical, fast, and human
-              process.
+              Samer Solutions helps companies across the region hire strong
+              technology talent for permanent, contracting, and hybrid roles.
+              We keep the process practical, human, and focused on candidates
+              who actually fit.
             </p>
-            <a
-              class="primary-link"
-              href="https://www.linkedin.com/company/samersolutions/"
-            >
-              Visit the LinkedIn page
-            </a>
+            <div class="hero-actions">
+              <a class="primary-link" href="#company-form">Share a hiring brief</a>
+              <a
+                class="secondary-link"
+                href="https://www.linkedin.com/company/samersolutions/"
+              >
+                View LinkedIn page
+              </a>
+            </div>
           </div>
 
-          <aside class="signal-panel" aria-label="Company focus">
+          <aside class="snapshot" aria-label="Samer Solutions snapshot">
             <dl>
-              <div>
-                <dt>Focus</dt>
-                <dd>Tech recruitment</dd>
-              </div>
-              <div>
-                <dt>Roles</dt>
-                <dd>Permanent, contract, and hybrid</dd>
-              </div>
-              <div>
-                <dt>Approach</dt>
-                <dd>Understand the role. Filter properly. Match for fit.</dd>
-              </div>
               <div>
                 <dt>Base</dt>
                 <dd>Dubai</dd>
+              </div>
+              <div>
+                <dt>Coverage</dt>
+                <dd>UAE, GCC, and the wider region</dd>
+              </div>
+              <div>
+                <dt>Specialty</dt>
+                <dd>Technology recruitment</dd>
+              </div>
+              <div>
+                <dt>Models</dt>
+                <dd>Permanent · Contract · Hybrid</dd>
               </div>
             </dl>
           </aside>
         </div>
       </section>
+
+      <section class="section intro-section" aria-labelledby="approach-title">
+        <div>
+          <p class="section-label">Approach</p>
+          <h2 id="approach-title">Built for teams that want quality hiring without the noise.</h2>
+        </div>
+        <div class="approach-grid">
+          <article>
+            <span>01</span>
+            <h3>Understand the role</h3>
+            <p>
+              We clarify the real hiring problem before searching, including
+              skills, seniority, team context, budget, and urgency.
+            </p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Filter properly</h3>
+            <p>
+              We prioritize relevant profiles over volume, with clear screening
+              and fit checks before introductions.
+            </p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Move quickly</h3>
+            <p>
+              We keep the hiring path simple, responsive, and aligned so strong
+              candidates stay engaged.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section form-section" aria-labelledby="form-title">
+        <div class="form-copy">
+          <p class="section-label">Hiring brief</p>
+          <h2 id="form-title">Tell us what your company needs.</h2>
+          <p>
+            Share the essentials and Samer Solutions will review the brief.
+            This page is built for companies hiring across Dubai, the UAE, GCC,
+            and the wider region.
+          </p>
+        </div>
+
+        <form id="company-form" class="lead-form" novalidate>
+          <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+
+          <div class="field-grid">
+            <label>
+              <span>Company name</span>
+              <input name="companyName" autocomplete="organization" required />
+            </label>
+            <label>
+              <span>Contact name</span>
+              <input name="contactName" autocomplete="name" required />
+            </label>
+            <label>
+              <span>Work email</span>
+              <input name="email" type="email" autocomplete="email" required />
+            </label>
+            <label>
+              <span>Phone</span>
+              <input name="phone" autocomplete="tel" required />
+            </label>
+            <label>
+              <span>Company location</span>
+              <input
+                name="location"
+                autocomplete="address-level2"
+                placeholder="Dubai, Riyadh, Doha..."
+                required
+              />
+            </label>
+            <label>
+              <span>Hiring model</span>
+              <select name="hiringModel" required>
+                <option value="">Select one</option>
+                <option>Permanent</option>
+                <option>Contracting</option>
+                <option>Hybrid</option>
+                <option>Multiple roles</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            <span>Roles or skills needed</span>
+            <textarea
+              name="roles"
+              rows="4"
+              placeholder="Example: Senior backend engineer, data analyst, product designer..."
+              required
+            ></textarea>
+          </label>
+
+          <label>
+            <span>Timeline and notes</span>
+            <textarea
+              name="notes"
+              rows="4"
+              placeholder="Tell us about urgency, seniority, team context, budget range, or region coverage."
+            ></textarea>
+          </label>
+
+          <label class="hidden-field" aria-hidden="true">
+            <span>Website</span>
+            <input name="website" tabindex="-1" autocomplete="off" />
+          </label>
+
+          <button class="submit-button" type="submit">Send hiring brief</button>
+        </form>
+      </section>
     </main>
+
+    <script src="site.js" defer></script>
   </body>
 </html>
