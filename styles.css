@@ -76,7 +76,9 @@ main {
 .brand,
 .nav-link,
 .primary-link,
-.secondary-link {
+.secondary-link,
+.fallback-link,
+.site-footer a {
   text-decoration: none;
 }
 
@@ -361,6 +363,16 @@ h3 {
   color: #be123c;
 }
 
+.fallback-link {
+  color: inherit;
+  font-weight: 800;
+}
+
+.fallback-link:hover,
+.site-footer a:hover {
+  color: var(--blue);
+}
+
 .field-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -419,6 +431,28 @@ textarea {
 .submit-button:disabled {
   cursor: wait;
   opacity: 0.68;
+}
+
+.site-footer {
+  display: flex;
+  width: min(100% - 40px, 1180px);
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-inline: auto;
+  border-top: 1px solid var(--line);
+  padding-block: 26px 34px;
+  color: var(--ink-soft);
+  font-size: 0.94rem;
+  font-weight: 800;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer a {
+  color: var(--ink);
 }
 
 @media (max-width: 900px) {
@@ -486,5 +520,11 @@ textarea {
   .lead-form,
   .approach-grid article {
     padding: 22px;
+  }
+
+  .site-footer {
+    width: min(100% - 32px, 1180px);
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
