@@ -3,39 +3,45 @@
 Vercel site for [samer.solutions](https://samer.solutions), based on the Samer
 Solutions LinkedIn company page.
 
-The inquiry form posts to `/api/leads`. Submissions are logged in Vercel
-function logs and can be forwarded to a CRM or automation endpoint by setting
-`LEAD_WEBHOOK_URL` in Vercel.
+The inquiry form posts to `/api/leads`. Successful submissions can be stored in
+Vercel Blob by setting `BLOB_READ_WRITE_TOKEN` in Vercel.
 
-Daily CSV reporting:
+Admin dashboard:
 
-- Reports are addressed to `adam@samer.solutions` by default. Override with
-  `LEAD_REPORT_TO` if needed.
-- Set `BLOB_READ_WRITE_TOKEN` through a private Vercel Blob store so successful
-  leads are saved for reporting.
-- Set `RESEND_API_KEY` and `LEAD_REPORT_FROM` so `/api/report` can email the
-  daily CSV attachment.
-- Vercel Cron calls `/api/report` every day at 06:00 UTC.
-- Set `CRON_SECRET` to require a bearer token on manual report calls.
+- Admin page: `/admin`
+- The login flow requires username/password first, then a one-time code sent to
+  the configured admin email.
+- The admin session is stored in a short-lived, HttpOnly, Secure, SameSite cookie.
+- The dashboard can search, inspect, and export customer form submissions as JSON
+  or CSV.
 
-Local Mac export automation:
+Required Vercel environment variables:
 
-- `/api/export?format=html` returns a protected HTML lead dashboard with the raw
-  JSON embedded inside the file.
-- The Mac LaunchAgent `com.samer-solutions.download-leads` can download that
-  HTML file into `~/Downloads` once a day.
-- The local script expects `~/.samer-solutions-report.env` to contain
-  `SAMER_SOLUTIONS_EXPORT_SECRET`, using the same value as `LEAD_EXPORT_SECRET`
-  or `CRON_SECRET` in Vercel.
+- `BLOB_READ_WRITE_TOKEN`: private Vercel Blob token for storing and reading lead
+  submissions and one-time login challenges.
+- `RESEND_API_KEY`: sends the one-time admin login code.
+- `ADMIN_USERNAME`: use `admin`.
+- `ADMIN_PASSWORD`: set this to the admin password in Vercel, not in GitHub.
+- `ADMIN_EMAIL`: use `adam@samer.solutions`.
+- `ADMIN_EMAIL_FROM`: verified Resend sender, for example
+  `Samer Solutions <adam@samer.solutions>`.
+- `ADMIN_SESSION_SECRET`: long random string for signing admin cookies.
+
+Optional:
+
+- `ADMIN_PASSWORD_SHA256`: SHA-256 hash of the admin password. If set, this is
+  used instead of `ADMIN_PASSWORD`.
+- `LEAD_WEBHOOK_URL`: HTTPS endpoint to also forward public form submissions to a
+  CRM or automation service.
 
 Security notes:
 
-- The lead endpoint accepts `POST` requests with `application/json` only.
+- The public lead endpoint accepts `POST` requests with `application/json` only.
 - A honeypot field, payload-size guard, and strict required-field validation are
   in place.
 - Webhook forwarding is HTTPS-only and times out quickly if configured.
 - If the form cannot submit, the page gives customers a mail fallback to
   `adam@samer.solutions`.
-- The lead export endpoint requires a bearer secret and is not publicly readable.
+- Admin lead data is only available after password plus email code verification.
 - Site-wide Vercel headers include a restrictive CSP, frame protection,
   nosniff, referrer policy, and a limited permissions policy.
