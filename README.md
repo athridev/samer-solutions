@@ -27,6 +27,10 @@ Required Vercel environment variables:
   `Samer Solutions <adam@samer.solutions>`.
 - `ADMIN_SESSION_SECRET`: long random string for signing admin cookies.
 
+Resend sending DNS is configured in Porkbun with DKIM on `resend._domainkey`, SPF
+and MX on the `send` subdomain, plus DMARC at `_dmarc`. The root Google Workspace
+MX remains unchanged so `adam@samer.solutions` continues receiving email.
+
 Optional:
 
 - `ADMIN_PASSWORD_SHA256`: SHA-256 hash of the admin password. If set, this is
