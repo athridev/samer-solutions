@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#07111f" />
+    <title>Samer Solutions Admin</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="auth-view" id="auth-view" aria-labelledby="auth-title">
+        <div class="auth-panel">
+          <p class="eyebrow">Samer Solutions</p>
+          <h1 id="auth-title">Admin access</h1>
+          <p class="muted">
+            Sign in with the admin credentials, then confirm the one-time code
+            sent to the admin email.
+          </p>
+
+          <form id="credentials-form" class="auth-form">
+            <label>
+              <span>Username</span>
+              <input name="username" autocomplete="username" required />
+            </label>
+            <label>
+              <span>Password</span>
+              <input
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
+            </label>
+            <button type="submit">Send one-time code</button>
+          </form>
+
+          <form id="code-form" class="auth-form is-hidden">
+            <label>
+              <span>One-time code</span>
+              <input
+                name="code"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                required
+              />
+            </label>
+            <button type="submit">Open dashboard</button>
+            <button class="ghost-button" id="back-to-login" type="button">
+              Back
+            </button>
+          </form>
+
+          <div class="status" id="auth-status" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="dashboard is-hidden" id="dashboard" aria-labelledby="dashboard-title">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Admin dashboard</p>
+            <h1 id="dashboard-title">Customer form inputs</h1>
+          </div>
+          <button class="ghost-button" id="logout-button" type="button">Log out</button>
+        </header>
+
+        <section class="stats" aria-label="Lead summary">
+          <article>
+            <span>Total leads</span>
+            <strong id="total-leads">0</strong>
+          </article>
+          <article>
+            <span>Latest company</span>
+            <strong id="latest-company">None</strong>
+          </article>
+          <article>
+            <span>Last loaded</span>
+            <strong id="last-loaded">-</strong>
+          </article>
+        </section>
+
+        <section class="toolbar" aria-label="Lead tools">
+          <input
+            id="search"
+            type="search"
+            placeholder="Search company, contact, role, phone, location..."
+            autocomplete="off"
+          />
+          <button id="refresh-button" type="button">Refresh</button>
+          <button id="export-json" type="button">Export JSON</button>
+          <a class="button-link" href="/api/admin/leads?format=csv&limit=10000">Export CSV</a>
+        </section>
+
+        <div class="content-grid">
+          <section class="lead-list" id="lead-list" aria-label="Lead list"></section>
+          <aside class="detail-panel" id="detail-panel" aria-label="Lead details">
+            <p class="eyebrow">Details</p>
+            <h2>Select a lead</h2>
+            <p class="muted">Choose a customer submission to see full contact details, role requirements, and notes.</p>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script src="admin.js" defer></script>
+  </body>
+</html>
