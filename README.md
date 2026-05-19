@@ -18,6 +18,16 @@ Daily CSV reporting:
 - Vercel Cron calls `/api/report` every day at 06:00 UTC.
 - Set `CRON_SECRET` to require a bearer token on manual report calls.
 
+Local Mac export automation:
+
+- `/api/export?format=html` returns a protected HTML lead dashboard with the raw
+  JSON embedded inside the file.
+- The Mac LaunchAgent `com.samer-solutions.download-leads` can download that
+  HTML file into `~/Downloads` once a day.
+- The local script expects `~/.samer-solutions-report.env` to contain
+  `SAMER_SOLUTIONS_EXPORT_SECRET`, using the same value as `LEAD_EXPORT_SECRET`
+  or `CRON_SECRET` in Vercel.
+
 Security notes:
 
 - The lead endpoint accepts `POST` requests with `application/json` only.
@@ -26,5 +36,6 @@ Security notes:
 - Webhook forwarding is HTTPS-only and times out quickly if configured.
 - If the form cannot submit, the page gives customers a mail fallback to
   `adam@samer.solutions`.
+- The lead export endpoint requires a bearer secret and is not publicly readable.
 - Site-wide Vercel headers include a restrictive CSP, frame protection,
   nosniff, referrer policy, and a limited permissions policy.
