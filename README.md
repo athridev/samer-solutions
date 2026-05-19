@@ -3,8 +3,8 @@
 Vercel site for [samer.solutions](https://samer.solutions), based on the Samer
 Solutions LinkedIn company page.
 
-The inquiry form posts to `/api/leads`. Successful submissions can be stored in
-Vercel Blob by setting `BLOB_READ_WRITE_TOKEN` in Vercel.
+The inquiry form posts to `/api/leads`. Successful submissions are stored in the
+private Vercel Blob store connected to the production and preview deployments.
 
 Admin dashboard:
 
