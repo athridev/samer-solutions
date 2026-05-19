@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 560" role="img" aria-labelledby="title desc">
+  <title id="title">Regional hiring map</title>
+  <desc id="desc">A calm abstract map showing Dubai as the operating base, regional markets, and a path from role brief to shortlist.</desc>
+  <rect width="720" height="560" fill="#edecea"/>
+  <path d="M96 94h528v372H96z" fill="#f7f6f2" stroke="#1f211d" stroke-opacity=".16"/>
+  <path d="M96 184h528M96 278h528M96 372h528M198 94v372M320 94v372M442 94v372M544 94v372" stroke="#1f211d" stroke-opacity=".08"/>
+  <path d="M207 351c44-79 87-132 130-159 50-32 103-29 158 8 32 22 67 27 105 16" fill="none" stroke="#9b4a2f" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M206 350c38 20 75 29 111 26 49-4 83-32 119-72 31-34 72-52 121-54" fill="none" stroke="#385f4b" stroke-width="3.5" stroke-linecap="round"/>
+  <g fill="#1f211d">
+    <circle cx="207" cy="351" r="8"/>
+    <circle cx="337" cy="192" r="8"/>
+    <circle cx="496" cy="200" r="8"/>
+    <circle cx="557" cy="250" r="8"/>
+    <circle cx="436" cy="304" r="8"/>
+  </g>
+  <g font-family="Inter, ui-sans-serif, system-ui, sans-serif" fill="#1f211d">
+    <text x="118" y="132" font-size="18" font-weight="700">Samer Solutions</text>
+    <text x="118" y="159" font-size="13" fill="#686a61">Market view before outreach</text>
+    <text x="220" y="344" font-size="13" font-weight="700">Dubai</text>
+    <text x="348" y="186" font-size="13" fill="#686a61">UAE</text>
+    <text x="507" y="194" font-size="13" fill="#686a61">KSA</text>
+    <text x="568" y="255" font-size="13" fill="#686a61">Qatar</text>
+    <text x="448" y="326" font-size="13" fill="#686a61">Wider region</text>
+  </g>
+  <g transform="translate(118 410)" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+    <rect width="484" height="38" rx="6" fill="#1f211d"/>
+    <text x="18" y="25" fill="#f7f6f2" font-size="13" font-weight="700">Role brief</text>
+    <text x="156" y="25" fill="#f7f6f2" font-size="13" font-weight="700">Market map</text>
+    <text x="318" y="25" fill="#f7f6f2" font-size="13" font-weight="700">Shortlist</text>
+    <path d="M126 19h22M286 19h22" stroke="#d7a06d" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

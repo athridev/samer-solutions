@@ -1,7 +1,7 @@
 const form = document.querySelector("#company-form");
 const statusBox = document.querySelector("#form-status");
 const submitButton = form?.querySelector("button[type='submit']");
-const submitButtonLabel = submitButton?.textContent || "Send hiring brief";
+const submitButtonLabel = submitButton?.textContent || "Send brief";
 const fallbackEmail = "adam@samer.solutions";
 
 function setStatus(message, type) {
@@ -65,7 +65,7 @@ form?.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
   submitButton.textContent = "Sending...";
   form.setAttribute("aria-busy", "true");
-  setStatus("Sending your hiring brief...", "info");
+  setStatus("Sending the brief...", "info");
 
   try {
     const response = await fetch("/api/leads", {
@@ -87,7 +87,7 @@ form?.addEventListener("submit", async (event) => {
 
     form.reset();
     setStatus(
-      "Brief received. Our team will review the company details.",
+      "Brief received. The team will review the details and come back with a practical next step.",
       "success",
     );
   } catch (error) {
