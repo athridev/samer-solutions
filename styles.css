@@ -37,7 +37,6 @@ body {
   margin: 0;
   background:
     url("assets/paper-grain.svg") 0 0 / 180px 180px repeat,
-    linear-gradient(90deg, transparent 0, transparent calc(50% - 1px), rgba(23, 22, 18, 0.05) calc(50% - 1px), rgba(23, 22, 18, 0.05) 50%, transparent 50%),
     var(--paper);
 }
 
@@ -76,8 +75,8 @@ main {
   min-height: 82px;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 24px;
-  border-bottom: 1px solid var(--line);
   background: rgba(244, 241, 234, 0.86);
   backdrop-filter: blur(18px);
 }
@@ -150,14 +149,14 @@ main {
 .hero {
   display: grid;
   min-height: calc(100vh - 82px);
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
-  gap: clamp(42px, 8vw, 120px);
-  align-items: end;
-  padding-block: clamp(82px, 12vh, 142px) clamp(56px, 9vh, 112px);
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(44px, 6vw, 76px);
+  align-items: center;
+  padding-block: clamp(88px, 13vh, 148px) clamp(62px, 9vh, 110px);
 }
 
 .hero-copy {
-  max-width: 930px;
+  max-width: 1040px;
 }
 
 .eyebrow,
@@ -173,16 +172,14 @@ p {
 }
 
 h1 {
+  max-width: 1160px;
   margin-bottom: 30px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(4.1rem, 10.6vw, 9.7rem);
+  font-size: clamp(4rem, 7.8vw, 8rem);
   font-weight: 500;
   letter-spacing: 0;
-  line-height: 0.88;
-}
-
-h1 span {
-  display: block;
+  line-height: 0.94;
+  text-wrap: balance;
 }
 
 .intro {
@@ -214,22 +211,24 @@ h1 span {
 
 .hero-notes {
   display: grid;
-  gap: 0;
-  margin-bottom: 8px;
-  border-top: 1px solid var(--line);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 1040px;
 }
 
 .hero-notes div {
   display: grid;
   gap: 8px;
-  border-bottom: 1px solid var(--line);
-  padding-block: 22px;
+  border: 1px solid rgba(23, 22, 18, 0.1);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(255, 252, 245, 0.36);
 }
 
 .hero-notes strong {
   color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(1.45rem, 2.4vw, 2.15rem);
+  font-size: clamp(1.35rem, 2.1vw, 1.95rem);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1.02;
@@ -238,7 +237,6 @@ h1 span {
 .section {
   scroll-margin-top: 96px;
   padding-block: clamp(78px, 11vw, 138px);
-  border-top: 1px solid var(--line);
 }
 
 .statement,
@@ -261,6 +259,7 @@ h2 {
   font-weight: 500;
   letter-spacing: 0;
   line-height: 0.96;
+  text-wrap: balance;
 }
 
 .statement p,
@@ -287,15 +286,15 @@ h2 {
 .service-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
+  gap: 12px;
 }
 
 .service-card {
   position: relative;
   min-height: 340px;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+  border: 1px solid rgba(23, 22, 18, 0.1);
+  border-radius: 8px;
   padding: 24px;
   background: rgba(255, 252, 245, 0.34);
 }
@@ -365,7 +364,6 @@ h3 {
 .experience-list {
   display: grid;
   gap: 0;
-  border-top: 1px solid var(--line);
 }
 
 .experience-list div {
@@ -418,8 +416,7 @@ h3 {
 }
 
 .lead-form {
-  border-top: 1px solid var(--line);
-  padding-top: clamp(22px, 4vw, 34px);
+  padding-top: 0;
 }
 
 .form-status {
@@ -535,7 +532,6 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  border-top: 1px solid var(--line);
   padding-block: 26px 34px;
   color: var(--ink-soft);
   font-size: 0.94rem;
@@ -607,6 +603,7 @@ textarea {
   }
 
   .hero-notes {
+    grid-template-columns: 1fr;
     max-width: 680px;
   }
 
@@ -673,8 +670,8 @@ textarea {
   }
 
   h1 {
-    font-size: clamp(3.35rem, 16.5vw, 5.25rem);
-    line-height: 0.92;
+    font-size: clamp(3.15rem, 13.2vw, 4.65rem);
+    line-height: 0.96;
   }
 
   h2 {
@@ -729,7 +726,7 @@ textarea {
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 560px) {
   .site-header {
     flex-direction: column;
     gap: 14px;
