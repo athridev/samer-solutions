@@ -3,6 +3,9 @@ const statusBox = document.querySelector("#form-status");
 const submitButton = form?.querySelector("button[type='submit']");
 const submitButtonLabel = submitButton?.textContent || "Start the conversation";
 const fallbackEmail = "adam@samer.solutions";
+const navActions = document.querySelector(".nav-actions");
+const navToggle = document.querySelector(".nav-toggle");
+const navLinks = document.querySelectorAll(".nav-menu a");
 
 document.documentElement.classList.add("motion-ready");
 
@@ -30,6 +33,41 @@ if ("IntersectionObserver" in window) {
 } else {
   revealItems.forEach((item) => item.classList.add("is-revealed"));
 }
+
+function setNavOpen(isOpen) {
+  navActions?.classList.toggle("is-open", isOpen);
+  navToggle?.setAttribute("aria-expanded", String(isOpen));
+  navActions
+    ?.querySelector(".nav-menu")
+    ?.setAttribute("aria-hidden", String(!isOpen));
+  navLinks.forEach((link) => {
+    link.tabIndex = isOpen ? 0 : -1;
+  });
+}
+
+setNavOpen(false);
+
+navToggle?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  setNavOpen(!navActions?.classList.contains("is-open"));
+});
+
+navLinks.forEach((link) => {
+  link.addEventListener("click", () => setNavOpen(false));
+});
+
+document.addEventListener("click", (event) => {
+  if (!navActions?.contains(event.target)) {
+    setNavOpen(false);
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && navActions?.classList.contains("is-open")) {
+    setNavOpen(false);
+    navToggle?.focus();
+  }
+});
 
 function setStatus(message, type) {
   statusBox.replaceChildren(message);

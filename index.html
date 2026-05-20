@@ -9,6 +9,10 @@
     />
     <meta name="theme-color" content="#f4f1ea" />
     <title>Samer Solutions | Recruitment Partner</title>
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -18,9 +22,29 @@
         <span>Recruitment partner</span>
       </a>
       <nav class="nav-actions" aria-label="Primary navigation">
-        <a href="#services">Services</a>
-        <a href="#start">Start</a>
-        <a href="https://www.linkedin.com/company/samersolutions/">LinkedIn</a>
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="primary-menu"
+        >
+          <span class="nav-toggle-mark" aria-hidden="true">
+            <span></span>
+            <span></span>
+          </span>
+          <span>Explore</span>
+        </button>
+        <div class="nav-menu" id="primary-menu" aria-hidden="true">
+          <a href="#services" tabindex="-1">Services</a>
+          <a href="#start" tabindex="-1">Start</a>
+          <a
+            href="https://www.linkedin.com/company/samersolutions/"
+            rel="noopener"
+            tabindex="-1"
+          >
+            LinkedIn
+          </a>
+        </div>
       </nav>
     </header>
 
@@ -38,12 +62,18 @@
             engage strong candidates.
           </p>
           <div class="hero-actions" aria-label="Primary actions" data-reveal>
-            <a class="primary-link" href="#start">Tell us what you need</a>
+            <a class="primary-link" href="#start">
+              <span>Tell us what you need</span>
+            </a>
+            <a class="secondary-link" href="#services">
+              <span>Services</span>
+            </a>
             <a
               class="secondary-link"
               href="https://www.linkedin.com/company/samersolutions/"
+              rel="noopener"
             >
-              View LinkedIn
+              <span>LinkedIn</span>
             </a>
           </div>
         </div>
