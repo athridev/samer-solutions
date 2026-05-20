@@ -43,10 +43,16 @@ body {
   isolation: isolate;
 }
 
-body::before {
+body::before,
+body::after {
   position: fixed;
   inset: -18vh -22vw;
   z-index: 0;
+  content: "";
+  pointer-events: none;
+}
+
+body::before {
   background:
     linear-gradient(
       90deg,
@@ -56,13 +62,34 @@ body::before {
       rgba(244, 241, 234, 0.88)
     ),
     url("assets/paper-wave.svg") 0 0 / 1080px 320px repeat;
-  content: "";
-  opacity: 0.32;
-  pointer-events: none;
+  opacity: 0.4;
   transform: translate3d(-2.4%, -1.2%, 0);
   animation: paper-wave-roll 46s ease-in-out infinite;
   mix-blend-mode: multiply;
   will-change: transform;
+}
+
+body::after {
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 34%,
+      rgba(169, 95, 67, 0.2) 45%,
+      rgba(96, 112, 95, 0.14) 52%,
+      transparent 66%,
+      transparent 100%
+    )
+    -120% 0 / 220% 100% no-repeat;
+  opacity: 0.5;
+  transform: translate3d(-1.4%, -0.8%, 0);
+  animation:
+    paper-wave-roll 46s ease-in-out infinite,
+    paper-wave-sheen 13s linear infinite;
+  -webkit-mask: url("assets/paper-wave.svg") 0 0 / 1080px 320px repeat;
+  mask: url("assets/paper-wave.svg") 0 0 / 1080px 320px repeat;
+  mix-blend-mode: multiply;
+  will-change: background-position, transform;
 }
 
 body::selection {
@@ -94,6 +121,16 @@ main {
 
   50% {
     transform: translate3d(2.4%, 1.2%, 0);
+  }
+}
+
+@keyframes paper-wave-sheen {
+  0% {
+    background-position: -130% 0;
+  }
+
+  100% {
+    background-position: 130% 0;
   }
 }
 
@@ -835,11 +872,21 @@ textarea {
     background: var(--paper);
   }
 
-  body::before {
+  body::before,
+  body::after {
     inset: -12vh -66vw;
     background-size: 780px 250px;
-    opacity: 0.24;
     animation-duration: 54s;
+  }
+
+  body::before {
+    opacity: 0.3;
+  }
+
+  body::after {
+    opacity: 0.42;
+    -webkit-mask-size: 780px 250px;
+    mask-size: 780px 250px;
   }
 
   .site-header,
@@ -990,7 +1037,8 @@ textarea {
     transform: none;
   }
 
-  body::before {
+  body::before,
+  body::after {
     opacity: 0.18;
     transform: none;
     animation: none;
