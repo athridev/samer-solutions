@@ -13,6 +13,10 @@ const ALLOWED_HIRING_MODELS = new Set([
   "Contracting",
   "Hybrid",
   "Multiple roles",
+  "One important hire",
+  "Multiple hires",
+  "Contract or project team",
+  "Not sure yet",
 ]);
 
 const MAX_CONTENT_LENGTH = 10000;
@@ -127,13 +131,13 @@ module.exports = async function handler(request, response) {
   const contentLength = Number(getHeader(request, "content-length") || 0);
 
   if (contentLength > MAX_CONTENT_LENGTH) {
-    return sendJson(response, 413, { error: "The brief is too large." });
+    return sendJson(response, 413, { error: "The request is too large." });
   }
 
   const contentType = String(getHeader(request, "content-type"));
 
   if (!contentType.includes("application/json")) {
-    return sendJson(response, 415, { error: "Send the brief as JSON." });
+    return sendJson(response, 415, { error: "Send the request as JSON." });
   }
 
   let body;
@@ -178,7 +182,7 @@ module.exports = async function handler(request, response) {
   }
 
   if (!ALLOWED_HIRING_MODELS.has(lead.hiringModel)) {
-    return sendJson(response, 400, { error: "Select a valid hiring model." });
+    return sendJson(response, 400, { error: "Select a valid support option." });
   }
 
   console.log("SAMER_SOLUTIONS_LEAD", JSON.stringify(lead));
@@ -194,7 +198,7 @@ module.exports = async function handler(request, response) {
   } catch (error) {
     console.error("SAMER_SOLUTIONS_LEAD_WEBHOOK_ERROR", error);
     return sendJson(response, 502, {
-      error: "The brief was received but could not be forwarded. Please try again.",
+      error: "The request was received but could not be forwarded. Please try again.",
     });
   }
 
