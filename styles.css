@@ -45,6 +45,9 @@ body {
 
 body::before,
 body::after {
+  --wave-shift: 1080px;
+  --wave-lift: 34px;
+
   position: fixed;
   inset: -18vh -22vw;
   z-index: 0;
@@ -62,11 +65,19 @@ body::before {
       rgba(244, 241, 234, 0.88)
     ),
     url("assets/paper-wave.svg") 0 0 / 1080px 320px repeat;
+  background-position:
+    0 0,
+    0 0;
+  background-size:
+    auto,
+    1080px 320px;
   opacity: 0.4;
   transform: translate3d(-2.4%, -1.2%, 0);
-  animation: paper-wave-roll 46s ease-in-out infinite;
+  animation:
+    paper-wave-drift 22s linear infinite,
+    paper-wave-breathe 12s ease-in-out infinite;
   mix-blend-mode: multiply;
-  will-change: transform;
+  will-change: background-position, transform;
 }
 
 body::after {
@@ -84,12 +95,15 @@ body::after {
   opacity: 0.5;
   transform: translate3d(-1.4%, -0.8%, 0);
   animation:
-    paper-wave-roll 46s ease-in-out infinite,
-    paper-wave-sheen 13s linear infinite;
+    paper-wave-breathe 12s ease-in-out infinite,
+    paper-wave-sheen 13s linear infinite,
+    paper-wave-mask-drift 22s linear infinite;
   -webkit-mask: url("assets/paper-wave.svg") 0 0 / 1080px 320px repeat;
   mask: url("assets/paper-wave.svg") 0 0 / 1080px 320px repeat;
+  -webkit-mask-position: 0 0;
+  mask-position: 0 0;
   mix-blend-mode: multiply;
-  will-change: background-position, transform;
+  will-change: background-position, mask-position, transform;
 }
 
 body::selection {
@@ -113,7 +127,44 @@ main {
   overflow: clip;
 }
 
-@keyframes paper-wave-roll {
+@keyframes paper-wave-drift {
+  0% {
+    background-position:
+      0 0,
+      0 0;
+  }
+
+  50% {
+    background-position:
+      0 0,
+      calc(var(--wave-shift) / 2) var(--wave-lift);
+  }
+
+  100% {
+    background-position:
+      0 0,
+      var(--wave-shift) 0;
+  }
+}
+
+@keyframes paper-wave-mask-drift {
+  0% {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+
+  50% {
+    -webkit-mask-position: calc(var(--wave-shift) / 2) var(--wave-lift);
+    mask-position: calc(var(--wave-shift) / 2) var(--wave-lift);
+  }
+
+  100% {
+    -webkit-mask-position: var(--wave-shift) 0;
+    mask-position: var(--wave-shift) 0;
+  }
+}
+
+@keyframes paper-wave-breathe {
   0%,
   100% {
     transform: translate3d(-2.4%, -1.2%, 0);
@@ -874,9 +925,12 @@ textarea {
 
   body::before,
   body::after {
+    --wave-shift: 780px;
+    --wave-lift: 26px;
+
     inset: -12vh -66vw;
     background-size: 780px 250px;
-    animation-duration: 54s;
+    animation-duration: 19s, 13s;
   }
 
   body::before {
@@ -887,6 +941,7 @@ textarea {
     opacity: 0.42;
     -webkit-mask-size: 780px 250px;
     mask-size: 780px 250px;
+    animation-duration: 13s, 11s, 19s;
   }
 
   .site-header,
