@@ -545,13 +545,79 @@ h3 {
 }
 
 .scope-line span {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 11px 13px;
-  background: rgba(255, 252, 245, 0.44);
+  background:
+    linear-gradient(rgba(255, 252, 245, 0.52), rgba(255, 252, 245, 0.36)),
+    var(--paper);
   color: var(--ink-soft);
   font-size: 0.92rem;
   font-weight: 720;
+}
+
+.scope-line span::after {
+  position: absolute;
+  top: -3px;
+  left: 14px;
+  z-index: 1;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  animation: scope-light-orbit 5.8s linear infinite;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.9),
+    0 0 18px rgba(169, 95, 67, 0.18);
+  content: "";
+  opacity: 0.78;
+  pointer-events: none;
+}
+
+.scope-line span:nth-child(2)::after {
+  animation-delay: -0.8s;
+}
+
+.scope-line span:nth-child(3)::after {
+  animation-delay: -1.6s;
+}
+
+.scope-line span:nth-child(4)::after {
+  animation-delay: -2.4s;
+}
+
+.scope-line span:nth-child(5)::after {
+  animation-delay: -3.2s;
+}
+
+.scope-line span:nth-child(6)::after {
+  animation-delay: -4s;
+}
+
+@keyframes scope-light-orbit {
+  0%,
+  100% {
+    top: -3px;
+    left: 14px;
+  }
+
+  30% {
+    top: -3px;
+    left: calc(100% - 18px);
+  }
+
+  50% {
+    top: calc(100% - 2px);
+    left: calc(100% - 18px);
+  }
+
+  80% {
+    top: calc(100% - 2px);
+    left: 14px;
+  }
 }
 
 .form-section {
@@ -861,8 +927,7 @@ textarea {
   }
 
   .hero-actions {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: none;
   }
 
   .section {
@@ -937,5 +1002,10 @@ textarea {
   .motion-ready [data-reveal] {
     opacity: 1;
     transform: none;
+  }
+
+  .scope-line span::after {
+    animation: none;
+    opacity: 0.42;
   }
 }
