@@ -1,8 +1,35 @@
 const form = document.querySelector("#company-form");
 const statusBox = document.querySelector("#form-status");
 const submitButton = form?.querySelector("button[type='submit']");
-const submitButtonLabel = submitButton?.textContent || "Send brief";
+const submitButtonLabel = submitButton?.textContent || "Start the conversation";
 const fallbackEmail = "adam@samer.solutions";
+
+document.documentElement.classList.add("motion-ready");
+
+const revealItems = document.querySelectorAll("[data-reveal]");
+
+if ("IntersectionObserver" in window) {
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+        entry.target.classList.add("is-revealed");
+        revealObserver.unobserve(entry.target);
+      });
+    },
+    {
+      rootMargin: "0px 0px -6% 0px",
+      threshold: 0.08,
+    },
+  );
+
+  revealItems.forEach((item) => revealObserver.observe(item));
+} else {
+  revealItems.forEach((item) => item.classList.add("is-revealed"));
+}
 
 function setStatus(message, type) {
   statusBox.replaceChildren(message);
@@ -10,7 +37,7 @@ function setStatus(message, type) {
 }
 
 function fallbackMailLink(payload) {
-  const subject = encodeURIComponent(`Hiring brief from ${payload.companyName}`);
+  const subject = encodeURIComponent(`Hiring request from ${payload.companyName}`);
   const body = encodeURIComponent(
     [
       `Company name: ${payload.companyName}`,
@@ -65,7 +92,7 @@ form?.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
   submitButton.textContent = "Sending...";
   form.setAttribute("aria-busy", "true");
-  setStatus("Sending the brief...", "info");
+  setStatus("Sending your details...", "info");
 
   try {
     const response = await fetch("/api/leads", {
@@ -82,12 +109,12 @@ form?.addEventListener("submit", async (event) => {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(result.error || "Unable to send the brief.");
+      throw new Error(result.error || "Unable to send your details.");
     }
 
     form.reset();
     setStatus(
-      "Brief received. The team will review the details and come back with a practical next step.",
+      "Thanks. The team received your details and will come back with a clear next step.",
       "success",
     );
   } catch (error) {
