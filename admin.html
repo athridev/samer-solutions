@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#07111f" />
+    <meta name="theme-color" content="#f4f1ea" />
     <title>Samer Solutions Admin</title>
     <link rel="stylesheet" href="admin.css" />
   </head>
@@ -15,8 +15,8 @@
           <p class="eyebrow">Samer Solutions</p>
           <h1 id="auth-title">Admin access</h1>
           <p class="muted">
-            Sign in with the admin credentials, then confirm the one-time code
-            sent to the admin email.
+            Use the admin credentials, then enter the one-time code sent to the
+            admin email.
           </p>
 
           <form id="credentials-form" class="auth-form">
@@ -33,7 +33,7 @@
                 required
               />
             </label>
-            <button type="submit">Send one-time code</button>
+            <button type="submit">Send code</button>
           </form>
 
           <form id="code-form" class="auth-form is-hidden">
@@ -61,44 +61,119 @@
         <header class="topbar">
           <div>
             <p class="eyebrow">Admin dashboard</p>
-            <h1 id="dashboard-title">Customer form inputs</h1>
+            <h1 id="dashboard-title">Inquiries</h1>
+            <p class="muted" id="session-note">Secure admin session</p>
           </div>
-          <button class="ghost-button" id="logout-button" type="button">Log out</button>
+          <div class="topbar-actions">
+            <button class="ghost-button" id="refresh-button" type="button">Refresh</button>
+            <button class="ghost-button" id="logout-button" type="button">Log out</button>
+          </div>
         </header>
 
-        <section class="stats" aria-label="Lead summary">
+        <section class="stats" aria-label="Inquiry summary">
           <article>
-            <span>Total leads</span>
+            <span>Total active</span>
             <strong id="total-leads">0</strong>
           </article>
           <article>
-            <span>Latest company</span>
-            <strong id="latest-company">None</strong>
+            <span>Unread</span>
+            <strong id="unread-leads">0</strong>
           </article>
           <article>
-            <span>Last loaded</span>
-            <strong id="last-loaded">-</strong>
+            <span>High priority</span>
+            <strong id="priority-leads">0</strong>
+          </article>
+          <article>
+            <span>Latest</span>
+            <strong id="latest-company">None</strong>
           </article>
         </section>
 
-        <section class="toolbar" aria-label="Lead tools">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search company, contact, role, phone, location..."
-            autocomplete="off"
-          />
-          <button id="refresh-button" type="button">Refresh</button>
-          <button id="export-json" type="button">Export JSON</button>
-          <a class="button-link" href="/api/admin/leads?format=csv&limit=10000">Export CSV</a>
+        <section class="toolbar" aria-label="Inquiry tools">
+          <label class="search-field">
+            <span>Search</span>
+            <input
+              id="search"
+              type="search"
+              placeholder="Company, contact, email, phone, role, notes..."
+              autocomplete="off"
+            />
+          </label>
+          <label>
+            <span>View</span>
+            <select id="view-filter">
+              <option value="active">Active</option>
+              <option value="unread">Unread</option>
+              <option value="starred">Starred</option>
+              <option value="archived">Archived</option>
+              <option value="all">All</option>
+            </select>
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="status-filter">
+              <option value="all">All statuses</option>
+              <option value="new">New</option>
+              <option value="reviewing">Reviewing</option>
+              <option value="contacted">Contacted</option>
+              <option value="qualified">Qualified</option>
+              <option value="closed">Closed</option>
+            </select>
+          </label>
+          <label>
+            <span>Priority</span>
+            <select id="priority-filter">
+              <option value="all">All priorities</option>
+              <option value="urgent">Urgent</option>
+              <option value="high">High</option>
+              <option value="normal">Normal</option>
+              <option value="low">Low</option>
+            </select>
+          </label>
+          <label>
+            <span>Sort</span>
+            <select id="sort-order">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="priority">Priority first</option>
+              <option value="company">Company A-Z</option>
+              <option value="nextStep">Next step</option>
+            </select>
+          </label>
+          <button id="export-json" type="button">Export view</button>
+          <a class="button-link" href="/api/admin/leads?format=csv&limit=10000">CSV</a>
         </section>
 
-        <div class="content-grid">
-          <section class="lead-list" id="lead-list" aria-label="Lead list"></section>
-          <aside class="detail-panel" id="detail-panel" aria-label="Lead details">
-            <p class="eyebrow">Details</p>
-            <h2>Select a lead</h2>
-            <p class="muted">Choose a customer submission to see full contact details, role requirements, and notes.</p>
+        <section class="bulk-bar is-hidden" id="bulk-bar" aria-label="Bulk actions">
+          <strong id="selected-count">0 selected</strong>
+          <button class="ghost-button" data-bulk-action="read" type="button">Mark read</button>
+          <button class="ghost-button" data-bulk-action="unread" type="button">Mark unread</button>
+          <button class="ghost-button" data-bulk-action="archive" type="button">Archive</button>
+          <button class="ghost-button" data-bulk-action="unarchive" type="button">Unarchive</button>
+          <button class="danger-button" data-bulk-action="delete" type="button">Delete</button>
+        </section>
+
+        <div class="workspace">
+          <section class="inbox-panel" aria-label="Inquiry list">
+            <div class="list-heading">
+              <div>
+                <p class="eyebrow">Inbox</p>
+                <h2 id="result-count">Loading</h2>
+              </div>
+              <button class="text-button" id="select-visible" type="button">Select visible</button>
+            </div>
+            <div class="lead-list" id="lead-list" aria-live="polite"></div>
+          </section>
+
+          <aside class="detail-panel" id="detail-panel" aria-label="Inquiry details">
+            <div class="empty-state">
+              <p class="eyebrow">Details</p>
+              <h2>Select an inquiry</h2>
+              <p class="muted">
+                Choose a submission to manage contact details, status, notes,
+                next steps, tags, export, archive, or delete.
+              </p>
+            </div>
           </aside>
         </div>
       </section>
