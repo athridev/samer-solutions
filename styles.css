@@ -33,11 +33,36 @@ html {
 }
 
 body {
+  position: relative;
   min-height: 100vh;
   margin: 0;
+  overflow-x: hidden;
   background:
     url("assets/paper-grain.svg") 0 0 / 180px 180px repeat,
     var(--paper);
+  isolation: isolate;
+}
+
+body::before {
+  position: fixed;
+  inset: -18vh -22vw;
+  z-index: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(244, 241, 234, 0.88),
+      rgba(244, 241, 234, 0.18) 28%,
+      rgba(244, 241, 234, 0.14) 72%,
+      rgba(244, 241, 234, 0.88)
+    ),
+    url("assets/paper-wave.svg") 0 0 / 1080px 320px repeat;
+  content: "";
+  opacity: 0.32;
+  pointer-events: none;
+  transform: translate3d(-2.4%, -1.2%, 0);
+  animation: paper-wave-roll 46s ease-in-out infinite;
+  mix-blend-mode: multiply;
+  will-change: transform;
 }
 
 body::selection {
@@ -56,7 +81,20 @@ textarea {
 }
 
 main {
+  position: relative;
+  z-index: 1;
   overflow: clip;
+}
+
+@keyframes paper-wave-roll {
+  0%,
+  100% {
+    transform: translate3d(-2.4%, -1.2%, 0);
+  }
+
+  50% {
+    transform: translate3d(2.4%, 1.2%, 0);
+  }
 }
 
 .site-header,
@@ -691,6 +729,8 @@ textarea {
 }
 
 .site-footer {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -793,6 +833,13 @@ textarea {
 @media (max-width: 700px) {
   body {
     background: var(--paper);
+  }
+
+  body::before {
+    inset: -12vh -66vw;
+    background-size: 780px 250px;
+    opacity: 0.24;
+    animation-duration: 54s;
   }
 
   .site-header,
@@ -941,6 +988,12 @@ textarea {
   .motion-ready [data-reveal] {
     opacity: 1;
     transform: none;
+  }
+
+  body::before {
+    opacity: 0.18;
+    transform: none;
+    animation: none;
   }
 
 }
