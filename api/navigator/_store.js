@@ -1,10 +1,11 @@
 const LEADS_PATH = "navigator/leads.json";
 const STATE_PATH = "navigator/states.json";
 const MAX_LEADS = 5000;
+const seed = require("../../data/navigator-seed");
 
 async function readJson(pathname, fallback) {
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    throw new Error("BLOB_READ_WRITE_TOKEN is not configured.");
+    return fallback;
   }
 
   try {
@@ -81,10 +82,11 @@ function normalizeState(state) {
 }
 
 async function loadNavigatorLeads() {
-  const payload = await readJson(LEADS_PATH, { leads: [], updatedAt: "" });
+  const payload = await readJson(LEADS_PATH, seed);
   return {
     leads: Array.isArray(payload.leads) ? payload.leads.map(normalizeLead).slice(0, MAX_LEADS) : [],
     updatedAt: payload.updatedAt || "",
+    source: payload === seed ? "seed" : "blob",
   };
 }
 
