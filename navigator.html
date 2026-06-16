@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#f5f7f8" />
+    <title>Samer Solutions Lead Navigator</title>
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="stylesheet" href="/navigator.css" />
+  </head>
+  <body>
+    <section class="auth-screen" id="auth-screen">
+      <div class="auth-card">
+        <p class="eyebrow">Samer Solutions</p>
+        <h1>Lead Navigator</h1>
+        <p>
+          Sign in to open the private MEP and facilities lead cockpit. Lead data
+          is stored in private Vercel Blob after you import the CSV.
+        </p>
+        <div class="auth-actions">
+          <a class="primary-link" href="/api/auth/github/start">Continue with GitHub</a>
+          <a class="ghost-link" href="/admin">Use admin login</a>
+        </div>
+        <div class="auth-status" id="auth-status"></div>
+      </div>
+    </section>
+
+    <div class="app-shell is-hidden" id="app-shell">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <div class="brand-mark">SS</div>
+          <div>
+            <p class="eyebrow">Samer Solutions</p>
+            <h1>MEP &amp; Facilities Lead Navigator</h1>
+          </div>
+        </div>
+        <div class="command-strip">
+          <label class="search-box">
+            <span>Search</span>
+            <input id="search" type="search" autocomplete="off" placeholder="Company, segment, role, signal" />
+          </label>
+          <button class="icon-button" id="import-button" type="button" title="Import leads CSV">Import</button>
+          <input id="import-file" type="file" accept=".csv,text/csv" hidden />
+          <button class="icon-button" id="reset-button" type="button" title="Reset filters">Reset</button>
+          <button class="icon-button" id="export-button" type="button" title="Export filtered CSV">Export</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="left-rail">
+          <section class="metric-grid">
+            <div class="metric"><strong id="metric-total">0</strong><span>Leads</span></div>
+            <div class="metric"><strong id="metric-hot">0</strong><span>Priority 8+</span></div>
+            <div class="metric"><strong id="metric-email">0</strong><span>Direct email</span></div>
+            <div class="metric"><strong id="metric-touched">0</strong><span>Touched</span></div>
+          </section>
+
+          <section class="filter-stack">
+            <label>
+              <span>Segment</span>
+              <select id="segment-filter"></select>
+            </label>
+            <div class="two-up">
+              <label>
+                <span>Priority</span>
+                <select id="priority-filter">
+                  <option value="all">All</option>
+                  <option value="10">10 only</option>
+                  <option value="9">9+</option>
+                  <option value="8">8+</option>
+                  <option value="7">7+</option>
+                </select>
+              </label>
+              <label>
+                <span>Channel</span>
+                <select id="channel-filter">
+                  <option value="all">All</option>
+                  <option value="call">Call</option>
+                  <option value="email">Email</option>
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="contact form">Form</option>
+                </select>
+              </label>
+            </div>
+            <div class="toggle-grid">
+              <button class="toggle-pill" data-toggle="top25" type="button">Top 25</button>
+              <button class="toggle-pill" data-toggle="email" type="button">Email</button>
+              <button class="toggle-pill" data-toggle="careers" type="button">Careers</button>
+              <button class="toggle-pill" data-toggle="open" type="button">Open</button>
+            </div>
+          </section>
+
+          <section class="queue-header">
+            <div>
+              <p class="eyebrow">Queue</p>
+              <h2 id="queue-count">0 leads</h2>
+            </div>
+            <button class="icon-button" id="sort-button" type="button">Sort</button>
+          </section>
+
+          <div class="lead-list" id="lead-list"></div>
+        </aside>
+
+        <section class="detail-panel">
+          <div class="empty-state" id="empty-state">
+            <p class="eyebrow">Private lead sheet</p>
+            <h2>Import your leads_master.csv to begin.</h2>
+            <p>
+              Use the Import button in the top bar. The sheet will be saved
+              privately and can be replaced later when the lead sheet changes.
+            </p>
+          </div>
+
+          <div class="detail-content is-hidden" id="detail-content">
+            <div class="lead-hero">
+              <div>
+                <div class="lead-id-line" id="lead-meta"></div>
+                <h2 id="company-name"></h2>
+                <p id="segment-line"></p>
+              </div>
+              <div class="score-ring">
+                <strong id="priority-score"></strong>
+                <span id="confidence-score"></span>
+              </div>
+            </div>
+
+            <nav class="quick-actions">
+              <a id="website-link" target="_blank" rel="noreferrer">Website</a>
+              <a id="map-link" target="_blank" rel="noreferrer">Map</a>
+              <a id="linkedin-link" target="_blank" rel="noreferrer">LinkedIn</a>
+              <a id="signal-link" target="_blank" rel="noreferrer">Signal</a>
+            </nav>
+
+            <div class="intel-grid">
+              <section class="intel-section wide">
+                <h3>Why This Lead Matters</h3>
+                <p id="fit-text"></p>
+              </section>
+              <section class="intel-section">
+                <h3>Hiring Signal</h3>
+                <p id="signal-text"></p>
+              </section>
+              <section class="intel-section">
+                <h3>Likely Pain</h3>
+                <p id="pain-text"></p>
+              </section>
+            </div>
+
+            <section class="role-strip" id="role-strip"></section>
+
+            <section class="contact-matrix">
+              <div><span>Best contact</span><strong id="best-person"></strong></div>
+              <div><span>Phone</span><a id="phone-link"></a></div>
+              <div><span>Main email</span><a id="email-link"></a></div>
+              <div><span>Careers email</span><a id="careers-email-link"></a></div>
+              <div><span>Location</span><strong id="location-text"></strong></div>
+              <div><span>Services</span><strong id="services-text"></strong></div>
+            </section>
+          </div>
+        </section>
+
+        <aside class="action-panel">
+          <section class="status-block">
+            <h3>Contact State</h3>
+            <div class="segmented" id="status-buttons"></div>
+            <textarea id="lead-note" rows="5" placeholder="Private note for this lead"></textarea>
+          </section>
+
+          <section class="outreach-block">
+            <div class="outreach-top">
+              <div>
+                <p class="eyebrow">Outreach</p>
+                <h3 id="outreach-company">No lead selected</h3>
+              </div>
+              <button class="icon-button" id="copy-button" type="button">Copy</button>
+            </div>
+            <label>
+              <span>Recipient</span>
+              <input id="recipient-name" type="text" placeholder="Name or Hiring Team" />
+            </label>
+            <div class="tab-row" id="message-tabs">
+              <button class="tab-button active" data-tab="email" type="button">Email</button>
+              <button class="tab-button" data-tab="linkedin" type="button">LinkedIn</button>
+              <button class="tab-button" data-tab="call" type="button">Call</button>
+              <button class="tab-button" data-tab="follow" type="button">Follow-up</button>
+            </div>
+            <div class="subject-line" id="subject-line"></div>
+            <pre class="message-box" id="message-box"></pre>
+            <div class="outreach-actions">
+              <a id="mailto-link">Email</a>
+              <a id="form-link" target="_blank" rel="noreferrer">Form</a>
+            </div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/navigator.js" defer></script>
+  </body>
+</html>
