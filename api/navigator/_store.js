@@ -1,5 +1,3 @@
-const { get, put } = require("@vercel/blob");
-
 const LEADS_PATH = "navigator/leads.json";
 const STATE_PATH = "navigator/states.json";
 const MAX_LEADS = 5000;
@@ -10,6 +8,7 @@ async function readJson(pathname, fallback) {
   }
 
   try {
+    const { get } = await import("@vercel/blob");
     const stored = await get(pathname, { access: "private" });
     if (stored?.statusCode !== 200 || !stored.stream) return fallback;
     return JSON.parse(await new Response(stored.stream).text());
@@ -24,6 +23,7 @@ async function writeJson(pathname, payload) {
     throw new Error("BLOB_READ_WRITE_TOKEN is not configured.");
   }
 
+  const { put } = await import("@vercel/blob");
   await put(pathname, JSON.stringify(payload), {
     access: "private",
     allowOverwrite: true,
