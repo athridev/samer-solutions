@@ -1677,3 +1677,206 @@ textarea:hover {
     animation: none !important;
   }
 }
+
+/* Final motion pass: one composed wave, no color sweeps, no heavy glass layers. */
+body::before {
+  --wave-shift: 960px;
+
+  inset: -12vh -16vw;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(244, 241, 234, 0.98),
+      rgba(244, 241, 234, 0.22) 28%,
+      rgba(255, 252, 245, 0.14) 52%,
+      rgba(244, 241, 234, 0.22) 74%,
+      rgba(244, 241, 234, 0.98)
+    ),
+    url("assets/paper-wave.svg") 0 0 / 960px 280px repeat;
+  opacity: 0.11;
+  animation: none;
+  mix-blend-mode: normal;
+  transform: none;
+  will-change: auto;
+}
+
+body::after,
+.hero-actions::before,
+.nav-menu::before,
+.scope-line span::before {
+  display: none;
+  animation: none;
+}
+
+.site-header::before,
+.nav-menu,
+.hero-actions,
+.hero-notes div,
+.service-card,
+.scope-line span,
+.lead-form {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.site-header::before {
+  background:
+    linear-gradient(180deg, rgba(244, 241, 234, 0.98), rgba(244, 241, 234, 0.94)),
+    url("assets/paper-grain.svg") 0 0 / 180px 180px repeat;
+}
+
+.nav-menu {
+  visibility: hidden;
+  transform: translate3d(0, -4px, 0) scale(0.992);
+  transition:
+    opacity 160ms var(--ease),
+    transform 160ms var(--ease),
+    visibility 0ms linear 160ms;
+  will-change: auto;
+  contain: paint;
+}
+
+.nav-actions.is-open .nav-menu {
+  visibility: visible;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition:
+    opacity 160ms var(--ease),
+    transform 160ms var(--ease),
+    visibility 0ms linear 0ms;
+}
+
+.hero {
+  min-height: calc(100svh - 88px);
+}
+
+.hero::before {
+  inset: clamp(22px, 5vw, 68px) calc((100vw - 100%) / -2) auto;
+  height: min(38vh, 420px);
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      rgba(255, 252, 245, 0.34) 46%,
+      transparent
+    ),
+    url("assets/paper-wave.svg") 50% 50% / 1020px 300px repeat-x;
+  opacity: 0.2;
+  transform: translate3d(-2vw, 0, 0);
+  animation: refined-hero-wave 30s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes refined-hero-wave {
+  0% {
+    transform: translate3d(-2vw, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(2vw, 0, 0);
+  }
+}
+
+.hero-actions {
+  background:
+    linear-gradient(135deg, rgba(255, 252, 245, 0.86), rgba(244, 241, 234, 0.64)),
+    url("assets/paper-grain.svg") 0 0 / 140px 140px repeat;
+}
+
+.hero-notes div,
+.service-card,
+.lead-form {
+  background:
+    linear-gradient(155deg, rgba(255, 252, 245, 0.9), rgba(244, 241, 234, 0.66)),
+    url("assets/paper-grain.svg") 0 0 / 170px 170px repeat;
+}
+
+.motion-ready [data-reveal] {
+  transform: translateY(18px);
+  transition:
+    opacity 620ms var(--ease),
+    transform 620ms var(--ease);
+}
+
+@media (max-width: 700px) {
+  body::before {
+    --wave-shift: 740px;
+
+    inset: -8vh -46vw;
+    background-size:
+      auto,
+      740px 220px;
+    opacity: 0.08;
+  }
+
+  .hero::before {
+    inset: 12px -34vw auto;
+    height: 34vh;
+    opacity: 0.12;
+    animation-duration: 38s;
+  }
+
+  .nav-menu {
+    transform: translate3d(0, -4px, 0) scale(0.994);
+  }
+
+  .nav-actions.is-open .nav-menu {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  .site-header {
+    min-height: 66px;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding-block: 10px;
+  }
+
+  .brand {
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .brand strong {
+    font-size: 0.96rem;
+    white-space: nowrap;
+  }
+
+  .brand span {
+    max-width: min(230px, calc(100vw - 150px));
+    overflow: hidden;
+    font-size: 0.54rem;
+    letter-spacing: 0.085em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nav-actions {
+    width: auto;
+    margin-left: auto;
+  }
+
+  .nav-toggle {
+    width: auto;
+    min-width: 94px;
+    min-height: 38px;
+    padding-inline: 10px 12px;
+  }
+
+  .nav-menu {
+    top: calc(100% + 14px);
+    right: 0;
+    left: auto;
+    width: min(286px, calc(100vw - 24px));
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .hero::before,
+  .motion-ready [data-reveal] {
+    animation: none !important;
+    transition: none !important;
+  }
+}
