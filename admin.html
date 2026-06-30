@@ -63,9 +63,9 @@
 
       <section class="dashboard is-hidden" id="dashboard" aria-labelledby="dashboard-title">
         <header class="topbar">
-          <div>
-            <p class="eyebrow">Admin dashboard</p>
-            <h1 id="dashboard-title">Inquiries</h1>
+          <div class="topbar-copy">
+            <p class="eyebrow">Samer Solutions admin</p>
+            <h1 id="dashboard-title">Hiring requests</h1>
             <p class="muted" id="session-note">Secure admin session</p>
           </div>
           <div class="topbar-actions">
@@ -74,112 +74,290 @@
           </div>
         </header>
 
-        <section class="stats" aria-label="Inquiry summary">
-          <article>
-            <span>Total active</span>
-            <strong id="total-leads">0</strong>
-          </article>
-          <article>
-            <span>Unread</span>
-            <strong id="unread-leads">0</strong>
-          </article>
-          <article>
-            <span>High priority</span>
-            <strong id="priority-leads">0</strong>
-          </article>
-          <article>
-            <span>Latest</span>
-            <strong id="latest-company">None</strong>
-          </article>
-        </section>
+        <nav class="dashboard-tabs" aria-label="Admin sections">
+          <button class="tab-button is-active" data-admin-tab="leads" type="button">
+            <span>Hiring requests</span>
+            <strong id="lead-tab-count">0</strong>
+          </button>
+          <button class="tab-button" data-admin-tab="candidates" type="button">
+            <span>Candidate intake</span>
+            <strong id="candidate-tab-count">0</strong>
+          </button>
+        </nav>
 
-        <section class="toolbar" aria-label="Inquiry tools">
-          <label class="search-field">
-            <span>Search</span>
-            <input
-              id="search"
-              type="search"
-              placeholder="Company, contact, email, phone, role, notes..."
-              autocomplete="off"
-            />
-          </label>
-          <label>
-            <span>View</span>
-            <select id="view-filter">
-              <option value="active">Active</option>
-              <option value="unread">Unread</option>
-              <option value="starred">Starred</option>
-              <option value="archived">Archived</option>
-              <option value="all">All</option>
-            </select>
-          </label>
-          <label>
-            <span>Status</span>
-            <select id="status-filter">
-              <option value="all">All statuses</option>
-              <option value="new">New</option>
-              <option value="reviewing">Reviewing</option>
-              <option value="contacted">Contacted</option>
-              <option value="qualified">Qualified</option>
-              <option value="closed">Closed</option>
-            </select>
-          </label>
-          <label>
-            <span>Priority</span>
-            <select id="priority-filter">
-              <option value="all">All priorities</option>
-              <option value="urgent">Urgent</option>
-              <option value="high">High</option>
-              <option value="normal">Normal</option>
-              <option value="low">Low</option>
-            </select>
-          </label>
-          <label>
-            <span>Sort</span>
-            <select id="sort-order">
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
-              <option value="priority">Priority first</option>
-              <option value="company">Company A-Z</option>
-              <option value="nextStep">Next step</option>
-            </select>
-          </label>
-          <button id="export-json" type="button">Export view</button>
-          <a class="button-link" href="/api/admin/leads?format=csv&limit=10000">CSV</a>
-        </section>
-
-        <section class="bulk-bar is-hidden" id="bulk-bar" aria-label="Bulk actions">
-          <strong id="selected-count">0 selected</strong>
-          <button class="ghost-button" data-bulk-action="read" type="button">Mark read</button>
-          <button class="ghost-button" data-bulk-action="unread" type="button">Mark unread</button>
-          <button class="ghost-button" data-bulk-action="archive" type="button">Archive</button>
-          <button class="ghost-button" data-bulk-action="unarchive" type="button">Unarchive</button>
-          <button class="danger-button" data-bulk-action="delete" type="button">Delete</button>
-        </section>
-
-        <div class="workspace">
-          <section class="inbox-panel" aria-label="Inquiry list">
-            <div class="list-heading">
-              <div>
-                <p class="eyebrow">Inbox</p>
-                <h2 id="result-count">Loading</h2>
-              </div>
-              <button class="text-button" id="select-visible" type="button">Select visible</button>
-            </div>
-            <div class="lead-list" id="lead-list" aria-live="polite"></div>
+        <section class="admin-view" id="leads-view">
+          <section class="stats" aria-label="Hiring request summary">
+            <article>
+              <span>Total active</span>
+              <strong id="total-leads">0</strong>
+            </article>
+            <article>
+              <span>Unread</span>
+              <strong id="unread-leads">0</strong>
+            </article>
+            <article>
+              <span>High priority</span>
+              <strong id="priority-leads">0</strong>
+            </article>
+            <article>
+              <span>Latest</span>
+              <strong id="latest-company">None</strong>
+            </article>
           </section>
 
-          <aside class="detail-panel" id="detail-panel" aria-label="Inquiry details">
-            <div class="empty-state">
-              <p class="eyebrow">Details</p>
-              <h2>Select an inquiry</h2>
-              <p class="muted">
-                Choose a submission to manage contact details, status, notes,
-                next steps, tags, export, archive, or delete.
-              </p>
+          <section class="toolbar" aria-label="Hiring request tools">
+            <label class="search-field">
+              <span>Search</span>
+              <input
+                id="search"
+                type="search"
+                placeholder="Company, contact, email, phone, role, notes..."
+                autocomplete="off"
+              />
+            </label>
+            <label>
+              <span>View</span>
+              <select id="view-filter">
+                <option value="active">Active</option>
+                <option value="unread">Unread</option>
+                <option value="starred">Starred</option>
+                <option value="archived">Archived</option>
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>
+              <span>Status</span>
+              <select id="status-filter">
+                <option value="all">All statuses</option>
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="qualified">Qualified</option>
+                <option value="closed">Closed</option>
+                <option value="archived">Archived</option>
+              </select>
+            </label>
+            <label>
+              <span>Priority</span>
+              <select id="priority-filter">
+                <option value="all">All priorities</option>
+                <option value="urgent">Urgent</option>
+                <option value="high">High</option>
+                <option value="normal">Normal</option>
+                <option value="low">Low</option>
+              </select>
+            </label>
+            <label>
+              <span>Sort</span>
+              <select id="sort-order">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="priority">Priority first</option>
+                <option value="company">Company A-Z</option>
+                <option value="nextStep">Next step</option>
+              </select>
+            </label>
+            <button class="ghost-button" id="clear-lead-filters" type="button">Reset</button>
+            <button id="export-json" type="button">Export view</button>
+            <a class="button-link" href="/api/admin/leads?format=csv&limit=10000">CSV</a>
+          </section>
+
+          <section class="bulk-bar is-hidden" id="bulk-bar" aria-label="Bulk actions">
+            <strong id="selected-count">0 selected</strong>
+            <button class="ghost-button" data-bulk-action="read" type="button">Mark read</button>
+            <button class="ghost-button" data-bulk-action="unread" type="button">Mark unread</button>
+            <button class="ghost-button" data-bulk-action="archive" type="button">Archive</button>
+            <button class="ghost-button" data-bulk-action="unarchive" type="button">Unarchive</button>
+            <button class="danger-button" data-bulk-action="delete" type="button">Delete</button>
+          </section>
+
+          <div class="workspace">
+            <section class="inbox-panel" aria-label="Hiring request list">
+              <div class="list-heading">
+                <div>
+                  <p class="eyebrow">Inbox</p>
+                  <h2 id="result-count">Loading</h2>
+                </div>
+                <button class="text-button" id="select-visible" type="button">Select visible</button>
+              </div>
+              <div class="lead-list" id="lead-list" aria-live="polite"></div>
+            </section>
+
+            <aside class="detail-panel" id="detail-panel" aria-label="Hiring request details">
+              <div class="empty-state">
+                <p class="eyebrow">Details</p>
+                <h2>Select a hiring request</h2>
+                <p class="muted">
+                  Choose a request to manage contact details, status, notes,
+                  next steps, tags, export, archive, or delete.
+                </p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="admin-view is-hidden" id="candidates-view">
+          <section class="stats" aria-label="Candidate summary">
+            <article>
+              <span>Active profiles</span>
+              <strong id="total-candidates">0</strong>
+            </article>
+            <article>
+              <span>Unread</span>
+              <strong id="unread-candidates">0</strong>
+            </article>
+            <article>
+              <span>Open links</span>
+              <strong id="open-candidate-links">0</strong>
+            </article>
+            <article>
+              <span>Latest profile</span>
+              <strong id="latest-candidate">None</strong>
+            </article>
+          </section>
+
+          <section class="candidate-console" aria-label="Candidate link generation">
+            <div class="generator-panel">
+              <div>
+                <p class="eyebrow">One-time candidate link</p>
+                <h2>Generate intake</h2>
+                <p class="muted">
+                  Create a private link for a candidate to submit their profile,
+                  CV, consent, and signature.
+                </p>
+              </div>
+              <form class="generator-form" id="candidate-link-form">
+                <label>
+                  <span>Candidate name</span>
+                  <input name="candidateName" placeholder="Optional" autocomplete="off" />
+                </label>
+                <label>
+                  <span>Candidate email</span>
+                  <input name="candidateEmail" type="email" placeholder="Optional" autocomplete="off" />
+                </label>
+                <label>
+                  <span>Role focus</span>
+                  <input name="roleFocus" placeholder="Optional, e.g. Product, operations, finance" />
+                </label>
+                <label>
+                  <span>Expires</span>
+                  <select name="expiresDays">
+                    <option value="14">14 days</option>
+                    <option value="7">7 days</option>
+                    <option value="30">30 days</option>
+                    <option value="60">60 days</option>
+                  </select>
+                </label>
+                <label class="wide-field">
+                  <span>Internal note</span>
+                  <textarea name="note" rows="3" placeholder="Optional context visible only in admin"></textarea>
+                </label>
+                <button type="submit">Create secure link</button>
+              </form>
+              <div class="generated-link is-hidden" id="generated-candidate-link" aria-live="polite"></div>
             </div>
-          </aside>
-        </div>
+
+            <div class="links-panel">
+              <div class="list-heading compact">
+                <div>
+                  <p class="eyebrow">Generated links</p>
+                  <h2 id="candidate-link-count">Loading</h2>
+                </div>
+                <button class="text-button" id="refresh-candidate-links" type="button">Refresh</button>
+              </div>
+              <div class="candidate-link-list" id="candidate-link-list"></div>
+            </div>
+          </section>
+
+          <section class="toolbar" aria-label="Candidate tools">
+            <label class="search-field">
+              <span>Search</span>
+              <input
+                id="candidate-search"
+                type="search"
+                placeholder="Name, email, phone, title, location, skills..."
+                autocomplete="off"
+              />
+            </label>
+            <label>
+              <span>View</span>
+              <select id="candidate-view-filter">
+                <option value="active">Active</option>
+                <option value="unread">Unread</option>
+                <option value="starred">Starred</option>
+                <option value="archived">Archived</option>
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>
+              <span>Status</span>
+              <select id="candidate-status-filter">
+                <option value="all">All statuses</option>
+                <option value="new">New</option>
+                <option value="reviewing">Reviewing</option>
+                <option value="shortlisted">Shortlisted</option>
+                <option value="shared">Shared</option>
+                <option value="placed">Placed</option>
+                <option value="closed">Closed</option>
+              </select>
+            </label>
+            <label>
+              <span>Priority</span>
+              <select id="candidate-priority-filter">
+                <option value="all">All priorities</option>
+                <option value="urgent">Urgent</option>
+                <option value="high">High</option>
+                <option value="normal">Normal</option>
+                <option value="low">Low</option>
+              </select>
+            </label>
+            <label>
+              <span>Sort</span>
+              <select id="candidate-sort-order">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="priority">Priority first</option>
+                <option value="name">Name A-Z</option>
+                <option value="nextStep">Next step</option>
+              </select>
+            </label>
+            <button class="ghost-button" id="clear-candidate-filters" type="button">Reset</button>
+            <button id="export-candidates-json" type="button">Export view</button>
+            <a class="button-link" href="/api/admin/candidates?format=csv&limit=10000">CSV</a>
+          </section>
+
+          <section class="bulk-bar is-hidden" id="candidate-bulk-bar" aria-label="Candidate bulk actions">
+            <strong id="candidate-selected-count">0 selected</strong>
+            <button class="ghost-button" data-candidate-bulk-action="read" type="button">Mark read</button>
+            <button class="ghost-button" data-candidate-bulk-action="unread" type="button">Mark unread</button>
+            <button class="ghost-button" data-candidate-bulk-action="archive" type="button">Archive</button>
+            <button class="ghost-button" data-candidate-bulk-action="unarchive" type="button">Unarchive</button>
+            <button class="danger-button" data-candidate-bulk-action="delete" type="button">Delete</button>
+          </section>
+
+          <div class="workspace">
+            <section class="inbox-panel" aria-label="Candidate list">
+              <div class="list-heading">
+                <div>
+                  <p class="eyebrow">Candidate profiles</p>
+                  <h2 id="candidate-result-count">Loading</h2>
+                </div>
+                <button class="text-button" id="select-visible-candidates" type="button">Select visible</button>
+              </div>
+              <div class="lead-list" id="candidate-list" aria-live="polite"></div>
+            </section>
+
+            <aside class="detail-panel" id="candidate-detail-panel" aria-label="Candidate details">
+              <div class="empty-state">
+                <p class="eyebrow">Details</p>
+                <h2>Select a candidate</h2>
+                <p class="muted">
+                  Review CV details, consent, signature, notes, tags, next steps,
+                  export, archive, or delete.
+                </p>
+              </div>
+            </aside>
+          </div>
+        </section>
       </section>
     </main>
 

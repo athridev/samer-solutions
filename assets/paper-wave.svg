@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="420" viewBox="0 0 1400 420" preserveAspectRatio="none">
-  <g fill="none" stroke="#8e887d" stroke-linecap="round" vector-effect="non-scaling-stroke">
-    <path d="M-140 74 C 0 30 150 118 290 74 S 570 30 710 74 990 118 1130 74 1410 30 1550 74" opacity=".28" stroke-width="1.15"/>
-    <path d="M-120 132 C 28 96 164 166 312 132 S 588 96 736 132 1012 166 1160 132 1436 96 1584 132" opacity=".18" stroke-width=".95"/>
-    <path d="M-150 202 C -6 150 154 254 298 202 S 586 150 730 202 1018 254 1162 202 1450 150 1594 202" opacity=".24" stroke-width="1.05"/>
-    <path d="M-130 270 C 14 226 162 314 306 270 S 594 226 738 270 1026 314 1170 270 1458 226 1602 270" opacity=".15" stroke-width=".9"/>
-    <path d="M-150 342 C -6 298 154 386 298 342 S 586 298 730 342 1018 386 1162 342 1450 298 1594 342" opacity=".20" stroke-width="1"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="420" viewBox="0 0 1400 420" preserveAspectRatio="xMidYMid slice">
+  <g fill="none" stroke="#6f6a60" stroke-linecap="round" vector-effect="non-scaling-stroke">
+    <path d="M-140 74 C 0 30 150 118 290 74 S 570 30 710 74 990 118 1130 74 1410 30 1550 74" opacity=".18" stroke-width="1"/>
+    <path d="M-120 132 C 28 96 164 166 312 132 S 588 96 736 132 1012 166 1160 132 1436 96 1584 132" opacity=".12" stroke-width=".9"/>
+    <path d="M-150 202 C -6 150 154 254 298 202 S 586 150 730 202 1018 254 1162 202 1450 150 1594 202" opacity=".16" stroke-width="1"/>
+    <path d="M-130 270 C 14 226 162 314 306 270 S 594 226 738 270 1026 314 1170 270 1458 226 1602 270" opacity=".1" stroke-width=".85"/>
+    <path d="M-150 342 C -6 298 154 386 298 342 S 586 298 730 342 1018 386 1162 342 1450 298 1594 342" opacity=".13" stroke-width=".95"/>
   </g>
 </svg>

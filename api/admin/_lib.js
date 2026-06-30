@@ -6,9 +6,26 @@ const SESSION_TTL_SECONDS = 60 * 60 * 8;
 const CODE_TTL_SECONDS = 60 * 10;
 const MAX_CODE_ATTEMPTS = 5;
 const LEAD_PREFIX = "leads/";
-const ALLOWED_STATUSES = new Set(["new", "reviewing", "contacted", "qualified", "closed"]);
+const CANDIDATE_INVITE_PREFIX = "candidates/invitations/";
+const CANDIDATE_PROFILE_PREFIX = "candidates/profiles/";
+const ALLOWED_STATUSES = new Set(["new", "contacted", "qualified", "closed", "archived"]);
+const ALLOWED_CANDIDATE_STATUSES = new Set([
+  "new",
+  "reviewing",
+  "shortlisted",
+  "shared",
+  "placed",
+  "closed",
+]);
 const ALLOWED_PRIORITIES = new Set(["low", "normal", "high", "urgent"]);
 const EDITABLE_LEAD_FIELDS = new Set([
+  "name",
+  "company",
+  "roleTitle",
+  "hiringType",
+  "seniority",
+  "locationRequirement",
+  "message",
   "companyName",
   "contactName",
   "email",
@@ -17,6 +34,25 @@ const EDITABLE_LEAD_FIELDS = new Set([
   "hiringModel",
   "roles",
   "notes",
+]);
+const EDITABLE_CANDIDATE_FIELDS = new Set([
+  "fullName",
+  "email",
+  "phone",
+  "currentLocation",
+  "nationality",
+  "linkedin",
+  "portfolio",
+  "currentTitle",
+  "experienceYears",
+  "targetRoles",
+  "seniority",
+  "workModes",
+  "preferredLocations",
+  "salaryExpectation",
+  "noticePeriod",
+  "languages",
+  "summary",
 ]);
 
 function getHeader(request, name) {
@@ -87,7 +123,26 @@ function adminEmail() {
 }
 
 function adminEmailFrom() {
-  return process.env.ADMIN_EMAIL_FROM || process.env.LEAD_REPORT_FROM || "Samer Solutions <adam@samer.solutions>";
+  return process.env.ADMIN_EMAIL_FROM || process.env.LEAD_EMAIL_FROM || "Samer Solutions <adam@samer.solutions>";
+}
+
+function siteOrigin(request) {
+  if (process.env.PUBLIC_SITE_URL) {
+    return process.env.PUBLIC_SITE_URL.replace(/\/+$/, "");
+  }
+
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.replace(/\/+$/, "")}`;
+  }
+
+  const host = request ? getHeader(request, "host") : "";
+
+  if (host) {
+    const proto = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
+    return `${proto}://${host}`;
+  }
+
+  return "https://samer.solutions";
 }
 
 async function parseJsonBody(request) {
@@ -219,6 +274,46 @@ function leadPathFromId(id) {
   return pathname;
 }
 
+function candidatePathFromId(id) {
+  let pathname;
+
+  try {
+    pathname = fromBase64url(id);
+  } catch {
+    const error = new Error("Invalid candidate id.");
+    error.status = 400;
+    throw error;
+  }
+
+  if (!pathname.startsWith(CANDIDATE_PROFILE_PREFIX) || !pathname.endsWith(".json")) {
+    const error = new Error("Invalid candidate id.");
+    error.status = 400;
+    throw error;
+  }
+
+  return pathname;
+}
+
+function candidateInvitePathFromId(id) {
+  let pathname;
+
+  try {
+    pathname = fromBase64url(id);
+  } catch {
+    const error = new Error("Invalid candidate link id.");
+    error.status = 400;
+    throw error;
+  }
+
+  if (!pathname.startsWith(CANDIDATE_INVITE_PREFIX) || !pathname.endsWith(".json")) {
+    const error = new Error("Invalid candidate link id.");
+    error.status = 400;
+    throw error;
+  }
+
+  return pathname;
+}
+
 function normalizeBoolean(value, fallback = false) {
   if (typeof value === "boolean") {
     return value;
@@ -269,8 +364,60 @@ function normalizeDate(value) {
 }
 
 function normalizeLeadAdmin(admin = {}) {
+  const rawStatus = admin.status === "reviewing" ? "contacted" : admin.status;
+
   return {
-    status: ALLOWED_STATUSES.has(admin.status) ? admin.status : "new",
+    status: ALLOWED_STATUSES.has(rawStatus) ? rawStatus : "new",
+    priority: ALLOWED_PRIORITIES.has(admin.priority) ? admin.priority : "normal",
+    read: normalizeBoolean(admin.read, false),
+    starred: normalizeBoolean(admin.starred, false),
+    archived: normalizeBoolean(admin.archived, false) || rawStatus === "archived",
+    ownerNotes: sanitizeLongText(admin.ownerNotes || "", 5000),
+    nextStepAt: admin.nextStepAt ? normalizeDate(admin.nextStepAt) : "",
+    tags: normalizeTags(admin.tags || []),
+    updatedAt: admin.updatedAt || "",
+    updatedBy: admin.updatedBy || "",
+    history: Array.isArray(admin.history) ? admin.history.slice(-30) : [],
+  };
+}
+
+function normalizeLead(rawLead, blob = {}) {
+  const admin = normalizeLeadAdmin(rawLead.admin || {});
+  const pathname = blob.pathname || rawLead._pathname || "";
+  const companyName = sanitizeText(rawLead.company || rawLead.companyName, 180);
+  const contactName = sanitizeText(rawLead.name || rawLead.contactName, 160);
+  const roleTitle = sanitizeText(rawLead.roleTitle || rawLead.roles, 180);
+  const hiringType = sanitizeText(rawLead.hiringType || rawLead.hiringModel, 80);
+  const locationRequirement = sanitizeText(rawLead.locationRequirement || rawLead.location, 160);
+  const message = sanitizeLongText(rawLead.message || rawLead.notes, 2800);
+
+  return {
+    ...rawLead,
+    id: rawLead.id || (pathname ? leadIdFromPath(pathname) : ""),
+    name: contactName,
+    company: companyName,
+    roleTitle,
+    hiringType,
+    seniority: sanitizeText(rawLead.seniority || "Not sure", 80),
+    locationRequirement,
+    message,
+    companyName,
+    contactName,
+    email: sanitizeText(rawLead.email, 240).toLowerCase(),
+    phone: sanitizeText(rawLead.phone, 80),
+    location: locationRequirement,
+    hiringModel: hiringType,
+    roles: roleTitle,
+    notes: message,
+    source: sanitizeText(rawLead.source || "samer.solutions", 120),
+    submittedAt: rawLead.submittedAt || "",
+    admin,
+  };
+}
+
+function normalizeCandidateAdmin(admin = {}) {
+  return {
+    status: ALLOWED_CANDIDATE_STATUSES.has(admin.status) ? admin.status : "new",
     priority: ALLOWED_PRIORITIES.has(admin.priority) ? admin.priority : "normal",
     read: normalizeBoolean(admin.read, false),
     starred: normalizeBoolean(admin.starred, false),
@@ -284,24 +431,83 @@ function normalizeLeadAdmin(admin = {}) {
   };
 }
 
-function normalizeLead(rawLead, blob = {}) {
-  const admin = normalizeLeadAdmin(rawLead.admin || {});
-  const pathname = blob.pathname || rawLead._pathname || "";
+function normalizeCandidate(rawCandidate, blob = {}) {
+  const admin = normalizeCandidateAdmin(rawCandidate.admin || {});
+  const pathname = blob.pathname || rawCandidate._pathname || "";
+  const cv = rawCandidate.cv && typeof rawCandidate.cv === "object" ? rawCandidate.cv : {};
+  const consent = rawCandidate.consent && typeof rawCandidate.consent === "object" ? rawCandidate.consent : {};
 
   return {
-    ...rawLead,
-    id: rawLead.id || (pathname ? leadIdFromPath(pathname) : ""),
-    companyName: sanitizeText(rawLead.companyName, 160),
-    contactName: sanitizeText(rawLead.contactName, 160),
-    email: sanitizeText(rawLead.email, 240).toLowerCase(),
-    phone: sanitizeText(rawLead.phone, 80),
-    location: sanitizeText(rawLead.location, 160),
-    hiringModel: sanitizeText(rawLead.hiringModel, 80),
-    roles: sanitizeLongText(rawLead.roles, 2200),
-    notes: sanitizeLongText(rawLead.notes, 2200),
-    source: sanitizeText(rawLead.source || "samer.solutions", 120),
-    submittedAt: rawLead.submittedAt || "",
+    ...rawCandidate,
+    id: rawCandidate.id || (pathname ? leadIdFromPath(pathname) : ""),
+    fullName: sanitizeText(rawCandidate.fullName, 180),
+    email: sanitizeText(rawCandidate.email, 240).toLowerCase(),
+    phone: sanitizeText(rawCandidate.phone, 80),
+    currentLocation: sanitizeText(rawCandidate.currentLocation, 180),
+    nationality: sanitizeText(rawCandidate.nationality, 120),
+    linkedin: sanitizeText(rawCandidate.linkedin, 300),
+    portfolio: sanitizeText(rawCandidate.portfolio, 300),
+    currentTitle: sanitizeText(rawCandidate.currentTitle, 180),
+    experienceYears: sanitizeText(rawCandidate.experienceYears, 40),
+    targetRoles: sanitizeLongText(rawCandidate.targetRoles, 2200),
+    seniority: sanitizeText(rawCandidate.seniority, 80),
+    workModes: sanitizeText(rawCandidate.workModes, 180),
+    preferredLocations: sanitizeText(rawCandidate.preferredLocations, 240),
+    salaryExpectation: sanitizeText(rawCandidate.salaryExpectation, 120),
+    noticePeriod: sanitizeText(rawCandidate.noticePeriod, 120),
+    languages: sanitizeText(rawCandidate.languages, 240),
+    summary: sanitizeLongText(rawCandidate.summary, 2800),
+    source: sanitizeText(rawCandidate.source || "candidate-intake", 120),
+    submittedAt: rawCandidate.submittedAt || "",
+    invitationId: sanitizeText(rawCandidate.invitationId, 180),
+    cv: {
+      pathname: sanitizeText(cv.pathname, 500),
+      url: sanitizeText(cv.url, 800),
+      filename: sanitizeText(cv.filename, 220),
+      contentType: sanitizeText(cv.contentType, 160),
+      size: Number(cv.size || 0),
+    },
+    consent: {
+      shareWithClients: Boolean(consent.shareWithClients),
+      storeForOpportunities: Boolean(consent.storeForOpportunities),
+      accuracyConfirmed: Boolean(consent.accuracyConfirmed),
+      signedName: sanitizeText(consent.signedName, 180),
+      signedAt: consent.signedAt || "",
+      signatureStrokes: Array.isArray(consent.signatureStrokes)
+        ? consent.signatureStrokes.slice(0, 24)
+        : [],
+      noticeVersion: sanitizeText(consent.noticeVersion || "candidate-consent-2026-06-16", 80),
+      userAgent: sanitizeText(consent.userAgent, 260),
+    },
     admin,
+  };
+}
+
+function normalizeCandidateInvitation(rawInvite, blob = {}) {
+  const pathname = blob.pathname || rawInvite._pathname || "";
+
+  return {
+    id: rawInvite.id || (pathname ? leadIdFromPath(pathname) : ""),
+    candidateName: sanitizeText(rawInvite.candidateName, 180),
+    candidateEmail: sanitizeText(rawInvite.candidateEmail, 240).toLowerCase(),
+    roleFocus: sanitizeText(rawInvite.roleFocus, 220),
+    note: sanitizeLongText(rawInvite.note, 1200),
+    publicUrl: sanitizeText(rawInvite.publicUrl, 900),
+    token: rawInvite.token || "",
+    tokenHash: sanitizeText(rawInvite.tokenHash, 180),
+    createdAt: rawInvite.createdAt || "",
+    createdBy: sanitizeText(rawInvite.createdBy, 80),
+    expiresAt: rawInvite.expiresAt || "",
+    revokedAt: rawInvite.revokedAt || "",
+    usedAt: rawInvite.usedAt || "",
+    submissionId: sanitizeText(rawInvite.submissionId, 220),
+    status: rawInvite.revokedAt
+      ? "revoked"
+      : rawInvite.usedAt
+        ? "used"
+        : rawInvite.expiresAt && Date.now() > Date.parse(rawInvite.expiresAt)
+          ? "expired"
+          : "open",
   };
 }
 
@@ -332,13 +538,63 @@ function applyLeadPatch(existingLead, patch, actor = "admin") {
       continue;
     }
 
-    if (field === "roles" || field === "notes") {
-      next[field] = sanitizeLongText(patch[field], 2200);
+    if (field === "roles" || field === "notes" || field === "message") {
+      next[field] = sanitizeLongText(patch[field], field === "message" ? 2800 : 2200);
       continue;
     }
 
-    next[field] = sanitizeText(patch[field], field === "phone" ? 80 : 160);
+    next[field] = sanitizeText(patch[field], field === "phone" ? 80 : 180);
   }
+
+  if (Object.prototype.hasOwnProperty.call(patch, "name")) {
+    next.contactName = next.name;
+  } else if (Object.prototype.hasOwnProperty.call(patch, "contactName")) {
+    next.name = next.contactName;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(patch, "company")) {
+    next.companyName = next.company;
+  } else if (Object.prototype.hasOwnProperty.call(patch, "companyName")) {
+    next.company = next.companyName;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(patch, "roleTitle")) {
+    next.roles = next.roleTitle;
+  } else if (Object.prototype.hasOwnProperty.call(patch, "roles")) {
+    next.roleTitle = next.roles;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(patch, "hiringType")) {
+    next.hiringModel = next.hiringType;
+  } else if (Object.prototype.hasOwnProperty.call(patch, "hiringModel")) {
+    next.hiringType = next.hiringModel;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(patch, "locationRequirement")) {
+    next.location = next.locationRequirement;
+  } else if (Object.prototype.hasOwnProperty.call(patch, "location")) {
+    next.locationRequirement = next.location;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(patch, "message")) {
+    next.notes = next.message;
+  } else if (Object.prototype.hasOwnProperty.call(patch, "notes")) {
+    next.message = next.notes;
+  }
+
+  next.name = sanitizeText(next.name || next.contactName, 160);
+  next.contactName = sanitizeText(next.contactName || next.name, 160);
+  next.company = sanitizeText(next.company || next.companyName, 180);
+  next.companyName = sanitizeText(next.companyName || next.company, 180);
+  next.roleTitle = sanitizeText(next.roleTitle || next.roles, 180);
+  next.roles = sanitizeText(next.roles || next.roleTitle, 180);
+  next.hiringType = sanitizeText(next.hiringType || next.hiringModel, 80);
+  next.hiringModel = sanitizeText(next.hiringModel || next.hiringType, 80);
+  next.locationRequirement = sanitizeText(next.locationRequirement || next.location, 160);
+  next.location = sanitizeText(next.location || next.locationRequirement, 160);
+  next.message = sanitizeLongText(next.message || next.notes, 2800);
+  next.notes = sanitizeLongText(next.notes || next.message, 2800);
+  next.seniority = sanitizeText(next.seniority || "Not sure", 80);
 
   const adminPatch = patch.admin && typeof patch.admin === "object" ? patch.admin : patch;
   const admin = normalizeLeadAdmin(existingLead.admin || {});
@@ -346,8 +602,130 @@ function applyLeadPatch(existingLead, patch, actor = "admin") {
   const changed = [];
 
   if (Object.prototype.hasOwnProperty.call(adminPatch, "status")) {
+    const previousStatus = admin.status;
+
     if (!ALLOWED_STATUSES.has(adminPatch.status)) {
       const error = new Error("Invalid lead status.");
+      error.status = 400;
+      throw error;
+    }
+
+    if (admin.status !== adminPatch.status) {
+      changed.push(`status:${adminPatch.status}`);
+    }
+
+    admin.status = adminPatch.status;
+
+    if (adminPatch.status === "archived") {
+      admin.archived = true;
+    } else if (previousStatus === "archived" && !Object.prototype.hasOwnProperty.call(adminPatch, "archived")) {
+      admin.archived = false;
+    }
+  }
+
+  if (Object.prototype.hasOwnProperty.call(adminPatch, "priority")) {
+    if (!ALLOWED_PRIORITIES.has(adminPatch.priority)) {
+      const error = new Error("Invalid lead priority.");
+      error.status = 400;
+      throw error;
+    }
+
+    if (admin.priority !== adminPatch.priority) {
+      changed.push(`priority:${adminPatch.priority}`);
+    }
+
+    admin.priority = adminPatch.priority;
+  }
+
+  for (const flag of ["read", "starred", "archived"]) {
+    if (!Object.prototype.hasOwnProperty.call(adminPatch, flag)) {
+      continue;
+    }
+
+    const value = Boolean(adminPatch[flag]);
+
+    if (admin[flag] !== value) {
+      changed.push(`${flag}:${value}`);
+    }
+
+    admin[flag] = value;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(adminPatch, "ownerNotes")) {
+    admin.ownerNotes = sanitizeLongText(adminPatch.ownerNotes, 5000);
+    changed.push("ownerNotes");
+  }
+
+  if (Object.prototype.hasOwnProperty.call(adminPatch, "nextStepAt")) {
+    admin.nextStepAt = normalizeDate(adminPatch.nextStepAt);
+    changed.push("nextStepAt");
+  }
+
+  if (Object.prototype.hasOwnProperty.call(adminPatch, "tags")) {
+    admin.tags = normalizeTags(adminPatch.tags);
+    changed.push("tags");
+  }
+
+  admin.updatedAt = new Date().toISOString();
+  admin.updatedBy = actor;
+
+  if (changed.length) {
+    history.push({
+      at: admin.updatedAt,
+      by: actor,
+      action: changed.join(","),
+    });
+  }
+
+  admin.history = history.slice(-30);
+  next.admin = admin;
+
+  return next;
+}
+
+function applyCandidatePatch(existingCandidate, patch, actor = "admin") {
+  if (!patch || Array.isArray(patch) || typeof patch !== "object") {
+    const error = new Error("Invalid candidate update.");
+    error.status = 400;
+    throw error;
+  }
+
+  const next = { ...existingCandidate };
+
+  for (const field of EDITABLE_CANDIDATE_FIELDS) {
+    if (!Object.prototype.hasOwnProperty.call(patch, field)) {
+      continue;
+    }
+
+    if (field === "email") {
+      const email = sanitizeText(patch.email, 240).toLowerCase();
+
+      if (email && !isEmail(email)) {
+        const error = new Error("Enter a valid email address.");
+        error.status = 400;
+        throw error;
+      }
+
+      next.email = email;
+      continue;
+    }
+
+    if (field === "targetRoles" || field === "summary") {
+      next[field] = sanitizeLongText(patch[field], field === "summary" ? 2800 : 2200);
+      continue;
+    }
+
+    next[field] = sanitizeText(patch[field], 300);
+  }
+
+  const adminPatch = patch.admin && typeof patch.admin === "object" ? patch.admin : patch;
+  const admin = normalizeCandidateAdmin(existingCandidate.admin || {});
+  const history = admin.history.slice(-29);
+  const changed = [];
+
+  if (Object.prototype.hasOwnProperty.call(adminPatch, "status")) {
+    if (!ALLOWED_CANDIDATE_STATUSES.has(adminPatch.status)) {
+      const error = new Error("Invalid candidate status.");
       error.status = 400;
       throw error;
     }
@@ -361,7 +739,7 @@ function applyLeadPatch(existingLead, patch, actor = "admin") {
 
   if (Object.prototype.hasOwnProperty.call(adminPatch, "priority")) {
     if (!ALLOWED_PRIORITIES.has(adminPatch.priority)) {
-      const error = new Error("Invalid lead priority.");
+      const error = new Error("Invalid candidate priority.");
       error.status = 400;
       throw error;
     }
@@ -655,6 +1033,252 @@ async function deleteLeadById(id) {
   return { id };
 }
 
+function candidateTokenHash(token) {
+  return hmac(`candidate-intake:${token}`);
+}
+
+function publicCandidateUrl(token, request) {
+  return `${siteOrigin(request)}/candidate?token=${encodeURIComponent(token)}`;
+}
+
+async function createCandidateInvitation(input = {}, request, actor = "admin") {
+  const token = base64url(crypto.randomBytes(32));
+  const tokenHash = candidateTokenHash(token);
+  const now = new Date();
+  const days = Math.min(Math.max(Number(input.expiresDays || 14), 1), 90);
+  const expiresAt = new Date(now.getTime() + days * 24 * 60 * 60 * 1000).toISOString();
+  const pathname = `${CANDIDATE_INVITE_PREFIX}${tokenHash}.json`;
+  const invitation = {
+    id: leadIdFromPath(pathname),
+    token,
+    tokenHash,
+    publicUrl: publicCandidateUrl(token, request),
+    candidateName: sanitizeText(input.candidateName, 180),
+    candidateEmail: sanitizeText(input.candidateEmail, 240).toLowerCase(),
+    roleFocus: sanitizeText(input.roleFocus, 220),
+    note: sanitizeLongText(input.note, 1200),
+    createdAt: now.toISOString(),
+    createdBy: actor,
+    expiresAt,
+    revokedAt: "",
+    usedAt: "",
+    submissionId: "",
+  };
+
+  if (invitation.candidateEmail && !isEmail(invitation.candidateEmail)) {
+    const error = new Error("Enter a valid candidate email.");
+    error.status = 400;
+    throw error;
+  }
+
+  await putPrivateJson(pathname, invitation);
+  return normalizeCandidateInvitation(invitation, { pathname });
+}
+
+async function loadCandidateInvitations(limit = 5000) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    throw new Error("BLOB_READ_WRITE_TOKEN is not configured.");
+  }
+
+  const { get, list } = await import("@vercel/blob");
+  const invitations = [];
+  let cursor;
+
+  do {
+    const result = await list({
+      prefix: CANDIDATE_INVITE_PREFIX,
+      cursor,
+      limit: Math.min(1000, limit - invitations.length),
+    });
+
+    for (const blob of result.blobs) {
+      if (!blob.pathname || !blob.pathname.endsWith(".json")) {
+        continue;
+      }
+
+      const stored = await get(blob.url, { access: "private" });
+
+      if (stored?.statusCode === 200 && stored.stream) {
+        const rawInvite = JSON.parse(await new Response(stored.stream).text());
+        invitations.push(normalizeCandidateInvitation(rawInvite, { pathname: blob.pathname }));
+      }
+
+      if (invitations.length >= limit) {
+        break;
+      }
+    }
+
+    cursor = result.cursor;
+  } while (cursor && invitations.length < limit);
+
+  return invitations.sort((left, right) =>
+    String(right.createdAt).localeCompare(String(left.createdAt)),
+  );
+}
+
+async function getCandidateInvitationByToken(token) {
+  const cleanToken = String(token || "").trim();
+
+  if (cleanToken.length < 24 || cleanToken.length > 160) {
+    const error = new Error("Invalid candidate link.");
+    error.status = 404;
+    throw error;
+  }
+
+  const pathname = `${CANDIDATE_INVITE_PREFIX}${candidateTokenHash(cleanToken)}.json`;
+  const invitation = await getPrivateJson(pathname);
+
+  if (!invitation) {
+    const error = new Error("Candidate link not found.");
+    error.status = 404;
+    throw error;
+  }
+
+  return {
+    invitation,
+    pathname,
+    normalized: normalizeCandidateInvitation(invitation, { pathname }),
+  };
+}
+
+async function getCandidateInvitationById(id) {
+  const pathname = candidateInvitePathFromId(id);
+  const invitation = await getPrivateJson(pathname);
+
+  if (!invitation) {
+    const error = new Error("Candidate link not found.");
+    error.status = 404;
+    throw error;
+  }
+
+  return {
+    invitation,
+    pathname,
+    normalized: normalizeCandidateInvitation(invitation, { pathname }),
+  };
+}
+
+function assertCandidateInviteUsable(invitation) {
+  if (invitation.revokedAt) {
+    const error = new Error("This candidate link has been revoked.");
+    error.status = 410;
+    throw error;
+  }
+
+  if (invitation.usedAt) {
+    const error = new Error("This candidate link has already been submitted.");
+    error.status = 410;
+    throw error;
+  }
+
+  if (Date.now() > Date.parse(invitation.expiresAt)) {
+    const error = new Error("This candidate link has expired.");
+    error.status = 410;
+    throw error;
+  }
+}
+
+async function revokeCandidateInvitation(id, actor = "admin") {
+  const { invitation, pathname } = await getCandidateInvitationById(id);
+  const updated = {
+    ...invitation,
+    revokedAt: invitation.revokedAt || new Date().toISOString(),
+    revokedBy: actor,
+  };
+
+  await putPrivateJson(pathname, updated);
+  return normalizeCandidateInvitation(updated, { pathname });
+}
+
+async function markCandidateInvitationUsed(token, submissionId) {
+  const { invitation, pathname } = await getCandidateInvitationByToken(token);
+  const updated = {
+    ...invitation,
+    usedAt: new Date().toISOString(),
+    submissionId,
+  };
+
+  await putPrivateJson(pathname, updated);
+  return normalizeCandidateInvitation(updated, { pathname });
+}
+
+async function loadCandidates(limit = 5000) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    throw new Error("BLOB_READ_WRITE_TOKEN is not configured.");
+  }
+
+  const { get, list } = await import("@vercel/blob");
+  const candidates = [];
+  let cursor;
+
+  do {
+    const result = await list({
+      prefix: CANDIDATE_PROFILE_PREFIX,
+      cursor,
+      limit: Math.min(1000, limit - candidates.length),
+    });
+
+    for (const blob of result.blobs) {
+      if (!blob.pathname || !blob.pathname.endsWith(".json")) {
+        continue;
+      }
+
+      const stored = await get(blob.url, { access: "private" });
+
+      if (stored?.statusCode === 200 && stored.stream) {
+        const rawCandidate = JSON.parse(await new Response(stored.stream).text());
+        candidates.push(normalizeCandidate(rawCandidate, { pathname: blob.pathname }));
+      }
+
+      if (candidates.length >= limit) {
+        break;
+      }
+    }
+
+    cursor = result.cursor;
+  } while (cursor && candidates.length < limit);
+
+  return candidates.sort((left, right) =>
+    String(right.submittedAt).localeCompare(String(left.submittedAt)),
+  );
+}
+
+async function getCandidateById(id) {
+  const pathname = candidatePathFromId(id);
+  const candidate = await getPrivateJson(pathname);
+
+  if (!candidate) {
+    const error = new Error("Candidate not found.");
+    error.status = 404;
+    throw error;
+  }
+
+  return {
+    candidate,
+    pathname,
+    normalized: normalizeCandidate(candidate, { pathname }),
+  };
+}
+
+async function updateCandidateById(id, patch, actor = "admin") {
+  const { candidate, pathname } = await getCandidateById(id);
+  const updated = applyCandidatePatch(candidate, patch, actor);
+  await putPrivateJson(pathname, updated);
+  return normalizeCandidate(updated, { pathname });
+}
+
+async function deleteCandidateById(id) {
+  const { candidate, pathname } = await getCandidateById(id);
+
+  await deletePrivateBlob(pathname);
+
+  if (candidate.cv?.pathname || candidate.cv?.url) {
+    await deletePrivateBlob(candidate.cv.pathname || candidate.cv.url);
+  }
+
+  return { id };
+}
+
 function csvCell(value) {
   const text = String(value || "");
   return `"${text.replace(/"/g, '""')}"`;
@@ -664,10 +1288,17 @@ function leadsToCsv(leads) {
   const columns = [
     "id",
     "submittedAt",
+    "company",
+    "name",
     "companyName",
     "contactName",
     "email",
     "phone",
+    "roleTitle",
+    "hiringType",
+    "seniority",
+    "locationRequirement",
+    "message",
     "location",
     "hiringModel",
     "roles",
@@ -702,26 +1333,109 @@ function leadsToCsv(leads) {
   ].join("\n");
 }
 
+function candidatesToCsv(candidates) {
+  const columns = [
+    "id",
+    "submittedAt",
+    "fullName",
+    "email",
+    "phone",
+    "currentLocation",
+    "nationality",
+    "currentTitle",
+    "experienceYears",
+    "targetRoles",
+    "seniority",
+    "workModes",
+    "preferredLocations",
+    "salaryExpectation",
+    "noticePeriod",
+    "languages",
+    "linkedin",
+    "portfolio",
+    "summary",
+    "cvFilename",
+    "consentShareWithClients",
+    "consentStoreForOpportunities",
+    "consentAccuracyConfirmed",
+    "signedName",
+    "signedAt",
+    "status",
+    "priority",
+    "read",
+    "starred",
+    "archived",
+    "nextStepAt",
+    "tags",
+    "ownerNotes",
+    "updatedAt",
+  ];
+
+  return [
+    columns.join(","),
+    ...candidates.map((candidate) => {
+      const admin = normalizeCandidateAdmin(candidate.admin || {});
+      const consent = candidate.consent || {};
+      const cv = candidate.cv || {};
+      const row = {
+        ...candidate,
+        cvFilename: cv.filename,
+        consentShareWithClients: consent.shareWithClients,
+        consentStoreForOpportunities: consent.storeForOpportunities,
+        consentAccuracyConfirmed: consent.accuracyConfirmed,
+        signedName: consent.signedName,
+        signedAt: consent.signedAt,
+        status: admin.status,
+        priority: admin.priority,
+        read: admin.read,
+        starred: admin.starred,
+        archived: admin.archived,
+        nextStepAt: admin.nextStepAt,
+        tags: admin.tags.join(", "),
+        ownerNotes: admin.ownerNotes,
+        updatedAt: admin.updatedAt,
+      };
+
+      return columns.map((column) => csvCell(row[column])).join(",");
+    }),
+  ].join("\n");
+}
+
 module.exports = {
   ADMIN_COOKIE,
+  ALLOWED_CANDIDATE_STATUSES,
   ALLOWED_PRIORITIES,
   ALLOWED_STATUSES,
   adminEmail,
+  assertCandidateInviteUsable,
+  candidatePathFromId,
+  candidatesToCsv,
   clearSessionCookie,
   createCodeChallenge,
+  createCandidateInvitation,
   credentialsMatch,
+  deleteCandidateById,
   deleteLeadById,
+  getCandidateById,
+  getCandidateInvitationById,
+  getCandidateInvitationByToken,
   getLeadById,
   getSession,
+  loadCandidateInvitations,
+  loadCandidates,
   leadsToCsv,
   loadLeads,
+  markCandidateInvitationUsed,
   parseJsonBody,
+  putPrivateJson,
   requireAdmin,
   requireSameOrigin,
+  revokeCandidateInvitation,
   sendCodeEmail,
   sendJson,
   setJsonHeaders,
   setSessionCookie,
+  updateCandidateById,
   updateLeadById,
   verifyCodeChallenge,
 };

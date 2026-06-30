@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "check": "node -c api/leads.js && node -c api/admin/_lib.js && node -c api/admin/request-code.js && node -c api/admin/verify-code.js && node -c api/admin/session.js && node -c api/admin/logout.js && node -c api/admin/leads.js && node -c api/admin/lead.js && node -c api/navigator/_store.js && node -c api/navigator/leads.js && node -c api/navigator/state.js && node -c site.js && node -c admin.js && node -c navigator.js"
+    "check": "node -c api/leads.js && node -c api/admin/_lib.js && node -c api/admin/request-code.js && node -c api/admin/verify-code.js && node -c api/admin/session.js && node -c api/admin/logout.js && node -c api/admin/leads.js && node -c api/admin/lead.js && node -c api/admin/candidate-links.js && node -c api/admin/candidates.js && node -c api/admin/candidate.js && node -c api/admin/candidate-cv.js && node -c api/candidate.js && node -c api/candidate/_invitation.js && node -c api/candidate/_submit.js && node -c site.js && node -c admin.js && node -c candidate.js"
   },
   "dependencies": {
     "@vercel/blob": "^2.0.0"

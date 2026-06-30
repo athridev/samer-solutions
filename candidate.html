@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#f4f1ea" />
+    <title>Candidate Intake | Samer Solutions</title>
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="stylesheet" href="/candidate.css" />
+  </head>
+  <body>
+    <main class="candidate-shell">
+      <header class="candidate-header">
+        <a class="brand" href="/" aria-label="Samer Solutions home">
+          <strong>Samer Solutions</strong>
+          <span>Candidate profile, carefully handled</span>
+        </a>
+        <p id="expiry-note">Secure one-time link</p>
+      </header>
+
+      <section class="hero" id="loading-view" aria-live="polite">
+        <p class="eyebrow">Candidate intake</p>
+        <h1>Loading your secure form.</h1>
+        <p class="muted">This should only take a moment.</p>
+      </section>
+
+      <section class="hero is-hidden" id="unavailable-view">
+        <p class="eyebrow">Candidate intake</p>
+        <h1>This link cannot be used.</h1>
+        <p class="muted" id="unavailable-message">
+          It may have expired, already been submitted, or been revoked.
+        </p>
+      </section>
+
+      <section class="hero is-hidden" id="success-view">
+        <p class="eyebrow">Profile received</p>
+        <h1>Thank you. Your profile is safely submitted.</h1>
+        <p class="muted">
+          The team will keep it on file for relevant opportunities and handle
+          your details with care.
+        </p>
+      </section>
+
+      <section class="intake is-hidden" id="form-view">
+        <div class="intro">
+          <p class="eyebrow">Candidate intake</p>
+          <h1 id="form-title">Share your profile.</h1>
+          <p>
+            Complete this once so the team can understand your background,
+            preferences, CV, and consent before discussing suitable
+            opportunities with employer clients.
+          </p>
+        </div>
+
+        <form id="candidate-form" class="candidate-form" enctype="multipart/form-data">
+          <input type="hidden" name="token" id="token-field" />
+          <input type="text" class="honeypot" name="website" autocomplete="off" tabindex="-1" />
+
+          <section class="form-section">
+            <div>
+              <p class="eyebrow">01</p>
+              <h2>Contact</h2>
+            </div>
+            <div class="field-grid">
+              <label>
+                <span>Full name</span>
+                <input name="fullName" id="full-name" autocomplete="name" required />
+              </label>
+              <label>
+                <span>Email</span>
+                <input name="email" id="email" type="email" autocomplete="email" required />
+              </label>
+              <label>
+                <span>Phone</span>
+                <input name="phone" type="tel" autocomplete="tel" required />
+              </label>
+              <label>
+                <span>Current location</span>
+                <input name="currentLocation" autocomplete="address-level2" required />
+              </label>
+              <label>
+                <span>Nationality</span>
+                <input name="nationality" autocomplete="country-name" />
+              </label>
+              <label>
+                <span>LinkedIn</span>
+                <input name="linkedin" type="url" placeholder="https://linkedin.com/in/..." />
+              </label>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <div>
+              <p class="eyebrow">02</p>
+              <h2>Work profile</h2>
+            </div>
+            <div class="field-grid">
+              <label>
+                <span>Current title</span>
+                <input name="currentTitle" required />
+              </label>
+              <label>
+                <span>Years of experience</span>
+                <input name="experienceYears" placeholder="e.g. 6 years" required />
+              </label>
+              <label>
+                <span>Seniority</span>
+                <select name="seniority">
+                  <option value="">Select if useful</option>
+                  <option>Individual contributor</option>
+                  <option>Lead / Manager</option>
+                  <option>Head of function</option>
+                  <option>Director / VP</option>
+                  <option>C-level</option>
+                </select>
+              </label>
+              <label>
+                <span>Work mode</span>
+                <select name="workModes">
+                  <option value="">Select if useful</option>
+                  <option>On-site</option>
+                  <option>Hybrid</option>
+                  <option>Remote</option>
+                  <option>Flexible</option>
+                </select>
+              </label>
+              <label>
+                <span>Preferred locations</span>
+                <input name="preferredLocations" placeholder="Dubai, Abu Dhabi, Riyadh, remote..." required />
+              </label>
+              <label>
+                <span>Notice period</span>
+                <input name="noticePeriod" placeholder="Immediate, 30 days, 60 days..." required />
+              </label>
+              <label>
+                <span>Salary expectation</span>
+                <input name="salaryExpectation" placeholder="Optional" />
+              </label>
+              <label>
+                <span>Languages</span>
+                <input name="languages" placeholder="Arabic, English..." />
+              </label>
+              <label class="wide">
+                <span>Target roles</span>
+                <textarea
+                  name="targetRoles"
+                  rows="4"
+                  placeholder="Roles, industries, company types, responsibilities, or anything that matters to your next move."
+                  required
+                ></textarea>
+              </label>
+              <label class="wide">
+                <span>Short profile summary</span>
+                <textarea
+                  name="summary"
+                  rows="5"
+                  placeholder="Write the version you would want a serious hiring team to understand first."
+                  required
+                ></textarea>
+              </label>
+              <label class="wide">
+                <span>Portfolio or website</span>
+                <input name="portfolio" type="url" placeholder="Optional" />
+              </label>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <div>
+              <p class="eyebrow">03</p>
+              <h2>CV</h2>
+            </div>
+            <div class="upload-box">
+              <label>
+                <span>Upload CV</span>
+                <input
+                  name="cv"
+                  id="cv"
+                  type="file"
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  required
+                />
+              </label>
+              <p id="file-note">PDF, DOC, or DOCX under 3.6 MB.</p>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <div>
+              <p class="eyebrow">04</p>
+              <h2>Consent</h2>
+            </div>
+            <div class="consent-panel">
+              <p>
+                I consent to Samer Solutions collecting and storing my profile,
+                CV, contact details, preferences, and signature for recruitment
+                purposes. I understand the team may share relevant parts of my
+                profile with potential employer clients across the region when
+                considering suitable opportunities.
+              </p>
+              <label class="check-row">
+                <input name="consentShare" type="checkbox" required />
+                <span>I consent to relevant profile details being shared with potential employer clients.</span>
+              </label>
+              <label class="check-row">
+                <input name="consentStore" type="checkbox" required />
+                <span>I consent to my details being stored for potential current and future opportunities.</span>
+              </label>
+              <label class="check-row">
+                <input name="consentAccuracy" type="checkbox" required />
+                <span>I confirm the information I provided is accurate to the best of my knowledge.</span>
+              </label>
+              <p class="fine-print">
+                You can request access, correction, or deletion by emailing
+                adam@samer.solutions.
+              </p>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <div>
+              <p class="eyebrow">05</p>
+              <h2>Signature</h2>
+            </div>
+            <div class="signature-box">
+              <canvas id="signature-pad" width="720" height="240" aria-label="Signature pad"></canvas>
+              <div class="signature-actions">
+                <label>
+                  <span>Typed full name</span>
+                  <input name="signedName" id="signed-name" autocomplete="name" required />
+                </label>
+                <button class="ghost-button" id="clear-signature" type="button">Clear signature</button>
+              </div>
+            </div>
+          </section>
+
+          <div class="submit-row">
+            <button id="submit-button" type="submit">Submit profile</button>
+            <p class="status" id="form-status" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script src="/candidate.js" defer></script>
+  </body>
+</html>

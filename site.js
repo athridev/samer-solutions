@@ -1,10 +1,11 @@
 const form = document.querySelector("#company-form");
 const statusBox = document.querySelector("#form-status");
 const submitButton = form?.querySelector("button[type='submit']");
-const submitButtonLabel = submitButton?.textContent || "Start the conversation";
+const submitButtonLabel = submitButton?.textContent || "Send hiring request";
 const fallbackEmail = "adam@samer.solutions";
 const navActions = document.querySelector(".nav-actions");
 const navToggle = document.querySelector(".nav-toggle");
+const navMenu = document.querySelector("#primary-menu");
 const navLinks = document.querySelectorAll(".nav-menu a");
 
 document.documentElement.classList.add("motion-ready");
@@ -24,7 +25,7 @@ if ("IntersectionObserver" in window) {
       });
     },
     {
-      rootMargin: "0px 0px -6% 0px",
+      rootMargin: "0px 0px -7% 0px",
       threshold: 0.08,
     },
   );
@@ -37,9 +38,7 @@ if ("IntersectionObserver" in window) {
 function setNavOpen(isOpen) {
   navActions?.classList.toggle("is-open", isOpen);
   navToggle?.setAttribute("aria-expanded", String(isOpen));
-  navActions
-    ?.querySelector(".nav-menu")
-    ?.setAttribute("aria-hidden", String(!isOpen));
+  navMenu?.setAttribute("aria-hidden", String(!isOpen));
   navLinks.forEach((link) => {
     link.tabIndex = isOpen ? 0 : -1;
   });
@@ -75,21 +74,20 @@ function setStatus(message, type) {
 }
 
 function fallbackMailLink(payload) {
-  const subject = encodeURIComponent(`Hiring request from ${payload.companyName}`);
+  const subject = encodeURIComponent(`Hiring request from ${payload.company}`);
   const body = encodeURIComponent(
     [
-      `Company name: ${payload.companyName}`,
-      `Contact name: ${payload.contactName}`,
+      `Name: ${payload.name}`,
       `Work email: ${payload.email}`,
-      `Phone: ${payload.phone}`,
-      `Company location: ${payload.location}`,
-      `Hiring model: ${payload.hiringModel}`,
+      `Phone / WhatsApp: ${payload.phone || "-"}`,
+      `Company: ${payload.company}`,
+      `Role or title needed: ${payload.roleTitle}`,
+      `Hiring type: ${payload.hiringType}`,
+      `Seniority: ${payload.seniority}`,
+      `Location requirement: ${payload.locationRequirement}`,
       "",
-      "Roles or skills needed:",
-      payload.roles,
-      "",
-      "Timeline and notes:",
-      payload.notes || "-",
+      "Hiring context:",
+      payload.message,
     ].join("\n"),
   );
 
@@ -118,6 +116,30 @@ function payloadFromForm(formElement) {
   );
 }
 
+function validatePayload(payload) {
+  const required = [
+    "name",
+    "email",
+    "company",
+    "roleTitle",
+    "hiringType",
+    "seniority",
+    "locationRequirement",
+    "message",
+  ];
+  const missing = required.filter((field) => !payload[field]);
+
+  if (missing.length) {
+    return "Please complete the required fields before sending.";
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+    return "Please enter a valid work email.";
+  }
+
+  return "";
+}
+
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -127,10 +149,17 @@ form?.addEventListener("submit", async (event) => {
   }
 
   const payload = payloadFromForm(form);
+  const validationError = validatePayload(payload);
+
+  if (validationError) {
+    setStatus(validationError, "error");
+    return;
+  }
+
   submitButton.disabled = true;
   submitButton.textContent = "Sending...";
   form.setAttribute("aria-busy", "true");
-  setStatus("Sending your details...", "info");
+  setStatus("Sending your hiring request...", "info");
 
   try {
     const response = await fetch("/api/leads", {
@@ -147,19 +176,16 @@ form?.addEventListener("submit", async (event) => {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(result.error || "Unable to send your details.");
+      throw new Error(result.error || "Unable to send your hiring request.");
     }
 
     form.reset();
     setStatus(
-      "Thanks. The team received your details and will come back with a clear next step.",
+      "Received. The team will review the role and come back with a clear next step.",
       "success",
     );
   } catch (error) {
-    setFallbackStatus(
-      error.message || "Something went wrong.",
-      payload,
-    );
+    setFallbackStatus(error.message || "Something went wrong.", payload);
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = submitButtonLabel;

@@ -1,5 +1,6 @@
 const {
   parseJsonBody,
+  requireSameOrigin,
   sendJson,
   setSessionCookie,
   verifyCodeChallenge,
@@ -9,6 +10,10 @@ module.exports = async function handler(request, response) {
   if (request.method !== "POST") {
     response.setHeader("Allow", "POST");
     return sendJson(response, 405, { error: "Method not allowed" });
+  }
+
+  if (!requireSameOrigin(request, response)) {
+    return;
   }
 
   let body;
